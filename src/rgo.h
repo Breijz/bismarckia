@@ -1,3 +1,6 @@
+#ifndef rgo_H
+#define rgo_H
+
 #include <iostream>
 #include <string>
 
@@ -76,3 +79,5 @@ class RGO {
                 }
 
 };
+
+#endif

@@ -4,6 +4,9 @@
 #include <cmath>
 
 #include "rgo.h"
+#include "common_market.h"
+#include "global_market.h"
+#include "goods.h"
 
 using namespace std;
 
