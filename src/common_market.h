@@ -17,6 +17,7 @@ class Common_Market {
     }
     
     private:
+        //In the future we want to allow multiple countries to be part of the same common market (namely spherelings with their great powers)
         vector<Good> vComMarktGoods;
         vector<Stockpile> vComMarktStock;
         bool bStockpile;                    //May be public in feature?
@@ -94,7 +95,7 @@ class Common_Market {
                             vComMarktGoods[i].fCurrentCost = fProposedPrice;
                         }
                     } else {
-                        cout << "Price Equilibrium!\n" << vComMarktGoods[i].fCurrentDemand << " = " << vComMarktGoods[i].fCurrentSupply << endl;
+                        cout << "Global Market: Price Equilibrium!\n" << vComMarktGoods[i].fCurrentDemand << " = " << vComMarktGoods[i].fCurrentSupply << endl;
                     }
                 }
             } else if(iDay == iPrevDay) {

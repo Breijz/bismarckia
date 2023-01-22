@@ -8,34 +8,6 @@
 
 using namespace std;
 
-class Global_Market {
-    public:
-        Global_Market() {
-            bStockpile = false;
-    }
-    
-    private:
-        bool bStockpile;
-        
-    public:
-        vector<Good> vGloMarktGoods;
-        vector<Stockpile> vGloMarktStock;
-        
-        
-    public:
-        /*
-         * first we should take from the common market, if the common market doesnt have enough
-         * then we should take from the global market to cover the defecit, if neither the global market 
-         * nor the common market has enough then we'll just not have enough
-        */
-        float fTakeGood(string szGood, float fAmount) {
-            
-        }
-        
-        
-
-};
-
 
 
 class Global_Market {
@@ -124,13 +96,13 @@ class Global_Market {
                             vGloMarktGoods[i].fCurrentCost = fProposedPrice;
                         }
                     } else {
-                        cout << "Price Equilibrium!\n" << vGloMarktGoods[i].fCurrentDemand << " = " << vGloMarktGoods[i].fCurrentSupply << endl;
+                        cout << "Global Market: Price Equilibrium!\n" << vGloMarktGoods[i].fCurrentDemand << " = " << vGloMarktGoods[i].fCurrentSupply << endl;
                     }
                 }
             } else if(iDay == iPrevDay) {
                 cout << "Already Calculated Prices for today!" << endl;
             } else {
-                cout << "????? Error in DailyPriceChange in common_market.h" << endl;
+                cout << "????? Error in DailyPriceChange in global_market.h" << endl;
             }
             iPrevDay = iDay;
         }
