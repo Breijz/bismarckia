@@ -33,16 +33,23 @@ class INI {
             bool ReadingGood = false;
             Readfile.open("neu/00-goods.ini");
             while(getline(Readfile, Line)) {
-                if(Line[0] == '[' && ReadingGood == true) {
+                if(Line[0] == '[' || Line[0] == ' ' && ReadingGood == true) {
                     GM.vGloMarktGoods.push_back(intl_Setup);
                     ReadingGood = false;
                 }
                 if(Line[0] == '[') {
                     ReadingGood = true;
+                    GetSectionName(Line);
+                    intl_Setup.szName = szSectionName;
                 }
                 if(ReadingGood == true) {
-                   SeperateKey(Line);
-                    
+                    SeperateKey(Line);
+                    //Here we check for keys
+                    if(szKeyName == "fOutputAmount") {
+                        cout << "ini.h : szKeyvalue = " << szKeyValue << endl;
+                        intl_Setup.fOutputAmount = atof(szKeyValue);
+                    }
+
                 }
                 
             }
