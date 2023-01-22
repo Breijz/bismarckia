@@ -4,7 +4,7 @@
 #include <iostream>
 #include <string>
 
-#include "goods.h"
+#include "common.h"
 
 using namespace std;
 
@@ -14,7 +14,7 @@ class Global_Market {
     public:
         Global_Market() {
             bStockpile = false;
-    }
+        }
     
     private:
         bool bStockpile;                    //May be public in feature?
@@ -22,10 +22,6 @@ class Global_Market {
     public:
         vector<Good> vGloMarktGoods;
         //vector<Stockpile> vGloMarktStock; //Not needed for the Global Market
-        
-    private : void InitaliseWithGoods() {
-     
-    }
         
         
     public:

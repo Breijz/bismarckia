@@ -5,23 +5,22 @@
 #include <fstream>
 #include <string>
 
-#include "global_market.h"
-#include "common_market.h"
-#include "goods.h"
+#include "common.h"
 
 using namespace std;
 
 
 
 class INI {
-    
-    public:
-    INI(Global_Market GM) {
-        GM = GM;
-    }
-    
-    public:
+    private:
         Global_Market GM;
+    
+    public:
+        INI(Global_Market XGM) {
+            GM = XGM;
+        }
+    
+    public:
         string szKeyName;
         string szKeyValue;
         string szSectionName;
@@ -47,7 +46,11 @@ class INI {
                     SeperateKey(Line);
                     //Here we check for keys
                     if(szKeyName == "fOutputAmount") {
-                        cout << "ini.h : szKeyvalue = " << szKeyValue << endl;
+                        cout << "ini.h : szKeyValue = " << szKeyValue << endl;
+                        intl_Setup.fOutputAmount = stof(szKeyValue);
+                    } else
+                    if(szKeyName == "fBasePrice") {
+                        cout << "ini.h : szKeyValue = " << szKeyValue << endl;
                         intl_Setup.fOutputAmount = stof(szKeyValue);
                     }
 

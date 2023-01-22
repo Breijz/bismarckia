@@ -4,6 +4,8 @@
 #include <iostream>
 #include <string>
 
+#include "common.h"
+
 using namespace std;
 
 class Good {
