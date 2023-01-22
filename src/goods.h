@@ -9,8 +9,10 @@ using namespace std;
 class Good {
 
     public:
-        Good(string szGoodName) {
-            szName = szGoodName;
+        //Good(string szGoodName) {
+        //    szName = szGoodName;
+        Good() {
+            szName = "NULL";
             fActivity = 0.0;
             fBaseCost = 0.0;
             uBasePop = 0;

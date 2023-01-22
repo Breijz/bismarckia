@@ -7,6 +7,7 @@
 
 #include "global_market.h"
 #include "common_market.h"
+#include "goods.h"
 
 using namespace std;
 
@@ -47,7 +48,7 @@ class INI {
                     //Here we check for keys
                     if(szKeyName == "fOutputAmount") {
                         cout << "ini.h : szKeyvalue = " << szKeyValue << endl;
-                        intl_Setup.fOutputAmount = atof(szKeyValue);
+                        intl_Setup.fOutputAmount = stof(szKeyValue);
                     }
 
                 }
@@ -60,8 +61,8 @@ class INI {
             bool Delim = false;
             for(int i = 0; i < szKey.length(); i++) {
                 if(szKey[i] == '=') { Delim = true; }
-                if(Delim == false && szKey != ' ' || szKey != '\n') { szKeyName.push_back(szKey[i]);}
-                if(Delim == true && szKey != ' ' || szKey != '\n') { szKeyValue.push_back(szKey[i]);}
+                if(Delim == false && szKey[i] != ' ' || szKey[i] != '\n') { szKeyName.push_back(szKey[i]);}
+                if(Delim == true && szKey[i] != ' ' || szKey[i] != '\n') { szKeyValue.push_back(szKey[i]);}
             }
         }
         

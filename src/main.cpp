@@ -8,6 +8,7 @@
 #include "common_market.h"
 #include "global_market.h"
 #include "goods.h"
+#include "ini.h"
 
 using namespace std;
 
