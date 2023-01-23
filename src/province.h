@@ -21,7 +21,7 @@ class Province {
                 //szRegion = "NULL"; see line 77
                 szTerrain = "Snow";
                 szGood = "Sand";
-                iLiferating = 0;
+                iLiferating = 35;
                 //iContient = 6;
         }
 

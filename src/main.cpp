@@ -8,6 +8,7 @@
 #include "common_market.h"
 #include "global_market.h"
 #include "goods.h"
+#include "country.h"
 //#include "ini.h"              No longer used
 
 
