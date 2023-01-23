@@ -1,6 +1,6 @@
 CPP=g++
 OPTFlags=-o
-Input=main.cpp
+Input=src/main.cpp
 Output=bmserver
 
 compile:

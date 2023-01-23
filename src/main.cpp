@@ -1,7 +1,6 @@
 #include <iostream>
 #include <thread>
 
-/*
 #include "state.h"
 #include "province.h"
 #include "pop.h"
@@ -9,10 +8,8 @@
 #include "common_market.h"
 #include "global_market.h"
 #include "goods.h"
-#include "ini.h"
-*/
+//#include "ini.h"              No longer used
 
-#include "common.h"
 
 using namespace std;
 
@@ -20,8 +17,10 @@ using namespace std;
 
 int main(int argc, char* argv[]) {
         Global_Market GM;
-        INI Setup(GM);
 
+        for(int i = 1; i < GM.vGloMarktGoods.size(); i++) {
+                cout << i << " : " << GM.vGloMarktGoods[i].szName << " : " << GM.vGloMarktGoods[i].fOutputAmount << " : " << GM.vGloMarktGoods[i].fBaseCost << endl;
+        }
 
 
 

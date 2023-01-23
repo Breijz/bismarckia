@@ -5,20 +5,14 @@
 #include <fstream>
 #include <string>
 
-#include "common.h"
+#include "global_market.h"
+#include "goods.h"
 
 using namespace std;
 
 
 
 class INI {
-    private:
-        Global_Market GM;
-    
-    public:
-        INI(Global_Market XGM) {
-            GM = XGM;
-        }
     
     public:
         string szKeyName;

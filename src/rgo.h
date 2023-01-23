@@ -5,7 +5,6 @@
 #include <string>
 #include <cmath>
 
-#include "common.h"
 
 using namespace std;
 

@@ -4,7 +4,8 @@
 #include <iostream>
 #include <string>
 
-#include "common.h"
+#include "goods.h"
+#include "global_market.h"
 
 using namespace std;
 
