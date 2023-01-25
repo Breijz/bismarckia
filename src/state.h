@@ -22,7 +22,7 @@ class State {
 
         public:
                 string szStateName;
-                uint StateID;
+                uint uStateID;
                 vector<Province> ProvincesOfState;
                 vector<string> Cores;
                 string szRegion;

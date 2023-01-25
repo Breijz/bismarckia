@@ -8,7 +8,7 @@
 
 using namespace std;
 
-class Pop { 
+/*class Pop { 
 
         public:
         Pop() {
@@ -46,12 +46,30 @@ class Pop {
                 vector<string> Idealogy;
                 //Implement Political wants (pro military, residency etc
                 // Similar to Idealogy
-                // JingoismL88.8, Pro-CitizenshipL12.3, etc...
+// JingoismL88.8, Pro-CitizenshipL12.3, etc...
                 vector<string> Causes;
                 float fBasicneeds;
                 float fEverydayneeds;
                 float fLuxuryneeds;
                 float fLiteracy;
+
+};*/
+
+//Minor rework, we'll just add things as we need them.
+class Pop {
+        public:
+                Pop(){
+                        szType = "farmer";
+                        szCulture = "minnesotan";
+                        szReligion = "protestant";
+                        uSize = 0;
+                }
+
+        public:
+                string szType;
+                string szCulture;
+                string szReligion;
+                uint uSize;
 
 };
 

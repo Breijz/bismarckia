@@ -11,10 +11,6 @@ using namespace std;
 
 
 
-typedef struct {
-    string Keyname;
-    string KeyValue;
-} KeyResult;
 
 class Global_Market {
     public:
@@ -25,6 +21,10 @@ class Global_Market {
     
     private:
         bool bStockpile;                    //May be public in feature?
+        typedef struct {
+            string Keyname;
+            string KeyValue;
+        } KeyResult;
     
     public:
         //vGloMarktGoods[0] == "NULL", counting/iterating vGloMarktGoods should always start from 1

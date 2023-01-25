@@ -5,6 +5,8 @@
 #include <string>
 #include <vector>
 
+#include "common_market.h"
+
 using namespace std;
 
 
@@ -20,7 +22,7 @@ class Country {
         
     public:
         string szName;
-        Common_Market CM;
+        //Common_Market CM;
         vector<State> StatesOfCountry;
         uint uPrestige_Score;
         uint uMilitary_Score;
