@@ -62,6 +62,8 @@ class Pop {
                         szType = "farmer";
                         szCulture = "minnesotan";
                         szReligion = "protestant";
+                        szRebel_Type = "NULL";
+                        uMilitancy = 0;
                         uSize = 0;
                 }
 
@@ -69,6 +71,8 @@ class Pop {
                 string szType;
                 string szCulture;
                 string szReligion;
+                string szRebel_Type;
+                uint uMilitancy;
                 uint uSize;
 
 };

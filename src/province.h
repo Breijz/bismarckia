@@ -15,20 +15,29 @@ class Province {
 
         public:
         Province() {
-                iID = 0;
+                uID = 0;
                 szOwner = "Unowned";
-                szProvince = "NULL";
-                //szRegion = "NULL"; see line 77
-                szTerrain = "Snow";
+                szController = "Unowned";
                 szGood = "Sand";
-                iLiferating = 35;
+                uLiferating = 35;
+                uNavelBase = 0;
+                //NOTE: Unused, for now :3      -Breizh
+                //szProvince = "NULL";
+                //szRegion = "NULL"; see line 77
+                //szTerrain = "Snow";
                 //iContient = 6;
         }
 
         public:
-                uint iID;
+                uint uID;
                 string szOwner;
-                string szProvince;
+                string szController;
+                vector<string> Cores;
+                string szGood;
+                uint uLiferating;
+                uint uNavelBase;
+                vector<Pop> Populations;
+                //string szProvince;
                 //string szRegion; moved to State Class
                 /*
                         szTerrain can be
@@ -46,9 +55,7 @@ class Province {
                         Steppe
                         Woods
                  */
-                string szTerrain;
-                string szGood;
-                uint iLiferating;
+                //string szTerrain;
                 /*
                  * Europe = 0
                  * North America = 1
@@ -58,7 +65,6 @@ class Province {
                  * Oceania = 5
                  */
                 //uint iContient;
-                vector<Pop> Populations;
                 //vector<string> Cores;
 };
 

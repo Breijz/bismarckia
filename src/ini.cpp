@@ -20,12 +20,7 @@ using namespace std;
  */
 
 
-/*
-typedef struct {
-    string szKeyName;
-    string szKeyValue;
-} KeyResult;
-*/
+
 
 
 string stripTabs(string szLine) {
@@ -40,21 +35,7 @@ string stripTabs(string szLine) {
 }
 
 
-/*KeyResult seperateKey(string Line) {
-    KeyResult Ans;
-    bool DelimPassed = false;
-    for(int i = 0; i < Line.size(); i++) {
-        if(Line[i] == '=') {
-            cout << "Delim On\n"; 
-            DelimPassed = true;
-        } else if(DelimPassed = false && Line[i] != ' ') {
-            Ans.szKeyName.push_back(Line[i]);
-        } else if(DelimPassed = true && Line[i] != ' ') {
-            Ans.szKeyValue.push_back(Line[i]);
-        }
-    }
-    return Ans;
-}*/
+
 
 //Inherit from servicd/getKeyValue.cpp
 KeyResult seperateKey(string Key) {
@@ -160,7 +141,7 @@ vector<Province> giveProvincePops(string File) {
                 LeftBracket++;
                 //Begin loop within province
                 //cout << "Reading Province (" << Key.szKeyName << ")\n";
-                ProvSetup.iID = stoi(Key.szKeyName);
+                ProvSetup.uID = stoi(Key.szKeyName);
                 while(getline(Readfile, szLine)) {
                     szLine = stripTabs(szLine);
                     if(szLine[0] != '#' && szLine[0] != ' ' && szLine[0] != '\r') {
@@ -195,71 +176,32 @@ vector<Province> giveProvincePops(string File) {
                                     PopSetup.szReligion = Key.szKeyValue;
                                 } else if(Key.szKeyName.compare("size") == 0) {
                                     PopSetup.uSize = stoi(Key.szKeyValue);
+                                } else if(Key.szKeyName.compare("militancy") == 0) {
+                                    PopSetup.uMilitancy = stoi(Key.szKeyValue);
+                                } else if(Key.szKeyName.compare("rebel_type") == 0) {
+                                    PopSetup.szRebel_Type = Key.szKeyValue;
                                 } else if(Key.szKeyName[0] == '}'){
                                     RightBracket++;
                                     PopList.push_back(PopSetup);
                                     break;
                                 } else {
-                                    cout << "(EE) Unknown Variable! : " << Key.szKeyName << endl;
+                                    cout << "(EE) Unknown Variable! : " << Key.szKeyName << " in " << File << endl;
                                 }
-                                /*if(Key.szKeyName[0] == '}') {
-                                    break;
-                                }*/
                             }
                         }
-
-                        
-                    
-                        /*if(Key.szKeyValue[0] == '{') { 
-                            LeftBracket++; 
-                            if(isKeyNamePop(Key.szKeyName) == true) {
-                                PopSetup.szType = Key.szKeyName;
-                            } else { cout << "Line 122: FUCK\n"; }
-                        }
-
-                        //else if(Key.szKeyValue[0] == '}') { cout << "Breaking!\n"; RightBracket++; break; }
-                        else if(Key.szKeyValue.compare("}") == 0) { cout << "Breaking\n"; RightBracket++; break;}
-                        else {
-                            if(Key.szKeyName.compare("culture") == 0) {
-                                PopSetup.szCulture = Key.szKeyValue;
-                            } else if(Key.szKeyName.compare("religion") == 0) {
-                                PopSetup.szReligion = Key.szKeyValue;
-                            } else if(Key.szKeyName.compare("size") == 0) {
-                                PopSetup.uSize = stoi(Key.szKeyValue);
-                            } else {
-                                cout << "Unknown Variable! : " << Key.szKeyName << endl;
-                            }
-                        }*/
                     }
 
                 }
 
 
             } else if(Key.szKeyValue[0] == '}') { RightBracket++; }
-            //else { cout << "Line 142: FUCK\n"; }
 
 
         } 
     }
 
-    //Old debug code
-    /*for(int i = 0; i < ProvinceWPops[0].Populations.size(); i++) {
-        cout << ProvinceWPops[0].iID << endl;
-        cout << ProvinceWPops[0].Populations[i].szType << endl;
-        cout << ProvinceWPops[0].Populations[i].szCulture << endl;
-        cout << ProvinceWPops[0].Populations[i].szReligion << endl;
-        cout << ProvinceWPops[0].Populations[i].uSize << endl;
-        cout << endl;
-    }
-    for(int i = 0; i < ProvinceWPops[1].Populations.size(); i++) {
-        cout << ProvinceWPops[1].iID << endl;
-        cout << ProvinceWPops[1].Populations[i].szType << endl;
-        cout << ProvinceWPops[1].Populations[i].szCulture << endl;
-        cout << ProvinceWPops[1].Populations[i].szReligion << endl;
-        cout << ProvinceWPops[1].Populations[i].uSize << endl;
-        cout << endl;
-    }*/
+    
 
-    //return EXIT_SUCCESS;
+    Readfile.close();
     return ProvinceWPops;
 } 
