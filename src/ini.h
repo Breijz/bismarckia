@@ -5,6 +5,7 @@
 #include <fstream>
 #include <string>
 #include <vector>
+#include <map>
 
 #include "pop.h"
 #include "province.h"
@@ -24,6 +25,6 @@ bool isKeyNamePop(string szLine);
 
 bool isNumber(string szLine);
 
-vector<Province> giveProvincePops(string File);
+map<string, string> readIniFile(string File);
 
 #endif

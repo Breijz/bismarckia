@@ -1,10 +1,11 @@
 CPP=g++
-OPTFlags=-o
-Input=src/main.cpp\
-      src/ini.cpp\
-      src/filelisting.cpp
 
-Output=bmserver
+all: server client
 
-compile:
-	${CPP} ${Input} ${OPTFlags} ${Output}
+server:
+	${CPP} src/main.cpp\
+		src/ini.cpp\
+		src/filelisting.cpp -o bmserver
+
+client:
+	${CPP} sp/main.cpp -lGLEW -lGL -lglfw -o bmclient

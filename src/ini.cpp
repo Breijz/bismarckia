@@ -4,6 +4,7 @@
 #include <fstream>
 #include <string>
 #include <vector>
+#include <map>
 
 #include "pop.h"
 #include "province.h"
@@ -26,7 +27,7 @@ using namespace std;
 string stripTabs(string szLine) {
     string Ans;
     for(int i = 0; i < szLine.size(); i++) {
-        if(szLine[i] != '\t') {
+        if(szLine[i] != '\t' && szLine[i] != ' ') {
             Ans.push_back(szLine[i]);
         }
     }
@@ -103,13 +104,55 @@ bool isNumber(string szLine) {
 }
 
 
+
+map<string, string> readIniFile(string File) {
+        Province ProvSetup;
+        Pop PopSetup;
+        vector<Province> ProvinceWPops;
+        fstream Readfile;
+        string szLine;
+        KeyResult Key;
+        map<string, string> Token_Map;
+        Readfile.open(File);
+
+        while(getline(Readfile, szLine)) {
+                szLine = stripTabs(szLine);
+                if(szLine[0] != '#') {
+                        Key = seperateKey(szLine);
+                        if(Key.szKeyName[0] == '}') {
+                                Token_Map.insert({"INI_ENDBRACKET","}"});
+                        } else {
+                                if(Key.szKeyName.empty() != true) {
+                                        Token_Map.insert({"INI_KEYNAME", Key.szKeyName});
+                                }
+                                if(Key.szKeyValue.empty() != true) {
+                                        if(Key.szKeyValue[0] == '{') {
+                                                Token_Map.insert({"INI_OPENBRACKET", "{" });
+                                        } else {
+                                                Token_Map.insert({"INI_KEYVALUE", Key.szKeyValue});
+                                        }
+                                }
+                        }
+
+
+
+                }
+        }
+
+
+
+
+        return Token_Map;
+}
+
+
 /*
     TODO: This is awful, it wont work for any files that _DONT_ follow the exact same fucking format as the files in
     'history/pops/1836.1.1/'
     So this _MUST_ be replaced in the future with a tokeniser i do believe. -Breizh
 */
 
-vector<Province> giveProvincePops(string File) {
+/*vector<Province> giveProvincePops(string File) {
 //int main(int argc, char* argv[]) {
     vector<Province> ProvinceWPops;
     vector<Pop> PopList;
@@ -127,6 +170,7 @@ vector<Province> giveProvincePops(string File) {
     */
     
 
+/*
     //Begin Reading entire file
     while(getline(Readfile, szLine)) {
         szLine = stripTabs(szLine);
@@ -204,4 +248,4 @@ vector<Province> giveProvincePops(string File) {
 
     Readfile.close();
     return ProvinceWPops;
-} 
+}*/ 
