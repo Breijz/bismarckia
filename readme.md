@@ -14,10 +14,10 @@ licensed under CC BY-SA.
 
 File Structure
 --------------
-/ - Root of directory (this includes this readme)
-/src - source code, should be mostly generic stuff (stuff that can be used in a engine, client, and/or server)
-/neu - relic, used for anything custom made
-/game - contains game files, it is excluded in the .gitignore, files from the orignal vic2 should be put in here (for example /game/history)
+/ - Root of directory (this includes this readme)  
+/src - source code, should be mostly generic stuff (stuff that can be used in a engine, client, and/or server)  
+/neu - relic, used for anything custom made  
+/game - contains game files, it is excluded in the .gitignore, files from the orignal vic2 should be put in here (for example /game/history)  
 
 Compiling
 =========
