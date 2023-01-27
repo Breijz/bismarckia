@@ -32,6 +32,6 @@ bool isNumber(string szLine);
 
 vector<Token> readIniFile(string File);
 
-vector<Province> populateProvinceWPops(string File);
+vector<Province> populateProvinceWPops();
 
 #endif

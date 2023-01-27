@@ -183,16 +183,17 @@ vector<Token> readIniFile(string File) {
  * from history/1836.1.1/pops
  */
 
-vector<Province> populateProvinceWPops(string File) {
+vector<Province> populateProvinceWPops() {
         vector<Token> Token_Map;
-        Token_Map = readIniFile(File);
+        //Token_Map = readIniFile(File);
         vector<Province> ProvWPop;
         vector<string> Listing;
         uint uOPENBRACKET = 0;
         uint uENDBRACKET = 0;
 
-        /*Listing = listingOfFolder("game/history/pops/1836.1.1/");
+        Listing = listingOfFolder("game/history/pops/1836.1.1/");
         
+        /*
          Fixing the File Listing 
         for(int i = 0; i < Listing.size(); i++) {
                 Listing[i] = "game/history/pops/1836.1.1/" + Listing[i];
@@ -200,14 +201,13 @@ vector<Province> populateProvinceWPops(string File) {
         }*/
 
 
-        //for(uint uFLInt = 0; uFLInt < Listing.size(); uFLInt++) {
-                /*
+        for(uint uFLInt = 0; uFLInt < Listing.size(); uFLInt++) {
                 Token_Map = readIniFile(Listing[uFLInt]);
-                cout << Listing[uFLInt] << endl;
+                //cout << Listing[uFLInt] << endl;
                 //cout << ProvWPop.size() << endl;
+                cout << uFLInt << endl;
                 uint uOPENBRACKET = 0;
                 uint uENDBRACKET = 0;
-                */
 
                 for(int i = 0; i < Token_Map.size(); i++) {
                         /* here we start reading Token_Map */
@@ -260,7 +260,7 @@ vector<Province> populateProvinceWPops(string File) {
                         }
                 }
         
-        //}
+        }
         
 
 

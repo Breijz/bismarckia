@@ -31,6 +31,11 @@ vector<string> listingOfFolder(char* Directory) {
             Listing.push_back(Readed->d_name);
         }
     }
+
+    /* Fixes the Listing */
+    for(int i = 0; i < Listing.size(); i++) {
+            Listing[i] = Directory + Listing[i];
+    }
     
     return Listing;
 }
