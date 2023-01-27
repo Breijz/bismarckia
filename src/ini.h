@@ -17,6 +17,11 @@ typedef struct {
     string szKeyValue;
 } KeyResult;
 
+typedef struct {
+        string Type;
+        string Value;
+} Token;
+
 string stripTabs(string szLine);
 
 KeyResult seperateKey(string Key);
@@ -25,6 +30,8 @@ bool isKeyNamePop(string szLine);
 
 bool isNumber(string szLine);
 
-map<string, string> readIniFile(string File);
+vector<Token> readIniFile(string File);
+
+vector<Province> populateProvinceWPops(string File);
 
 #endif

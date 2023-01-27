@@ -4,6 +4,8 @@
 #include <dirent.h>
 #include <sys/types.h>
 
+#include "unistd.h"
+
 using namespace std;
 
 /*
@@ -11,10 +13,16 @@ using namespace std;
 */
 
 vector<string> listingOfFolder(char* Directory) {
+    vector<string> Listing;
+        if(access(Directory, F_OK) != 0) {
+                cout << "File Doesnt Exist: " << Directory << endl;
+                return Listing;
+        }
+        
+
     DIR* dir;
     struct dirent* Readed;
 
-    vector<string> Listing;
 
     dir = opendir(Directory);
 

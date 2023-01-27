@@ -8,6 +8,7 @@
 
 #include "pop.h"
 #include "province.h"
+#include "filelisting.h"
 
 
 using namespace std;
@@ -104,35 +105,66 @@ bool isNumber(string szLine) {
 }
 
 
+/*
+ * This code is *alot* more generic, its nothing more than a tokeniser
+ * for the INI style files that Vic2 uses, and it should work for any
+ * format of the file, this function ought not to be used on its own but
+ * instead as part of another function...       -Breizh
+ */
 
-map<string, string> readIniFile(string File) {
-        Province ProvSetup;
-        Pop PopSetup;
-        vector<Province> ProvinceWPops;
-        fstream Readfile;
+vector<Token> readIniFile(string File) {
+        ifstream Readfile;
         string szLine;
         KeyResult Key;
-        map<string, string> Token_Map;
+        Token t_Setup;
+        vector<Token> Token_Map;
         Readfile.open(File);
 
+
         while(getline(Readfile, szLine)) {
+                t_Setup.Type.erase(t_Setup.Type.begin(), t_Setup.Type.end());
+                t_Setup.Value.erase(t_Setup.Value.begin(), t_Setup.Value.end());
+                Key.szKeyName.erase(Key.szKeyName.begin(), Key.szKeyName.end());
+                Key.szKeyValue.erase(Key.szKeyValue.begin(), Key.szKeyValue.end());
                 szLine = stripTabs(szLine);
-                if(szLine[0] != '#') {
+                if(szLine[0] != '#' && szLine[0] != '\r') {
                         Key = seperateKey(szLine);
-                        if(Key.szKeyName[0] == '}') {
-                                Token_Map.insert({"INI_ENDBRACKET","}"});
-                        } else {
-                                if(Key.szKeyName.empty() != true) {
-                                        Token_Map.insert({"INI_KEYNAME", Key.szKeyName});
-                                }
-                                if(Key.szKeyValue.empty() != true) {
-                                        if(Key.szKeyValue[0] == '{') {
-                                                Token_Map.insert({"INI_OPENBRACKET", "{" });
-                                        } else {
-                                                Token_Map.insert({"INI_KEYVALUE", Key.szKeyValue});
-                                        }
+                        if(Key.szKeyName.empty() != true && Key.szKeyName.compare("}\r") != 0) {
+                                //Token_Map.insert({"INI_KEYNAME", Key.szKeyName});
+                                //cout << "INI_KEYNAME: " << Key.szKeyName << endl;
+                                t_Setup.Type = "INI_KEYNAME";
+                                t_Setup.Value = Key.szKeyName;
+                                Token_Map.push_back(t_Setup);
+                        }
+                        if(Key.szKeyName[0] == '{') {
+                                //Token_Map.insert({"INI_OPENBRACKET", "{"});
+                                //cout << "INI_OPENBRACKET: " << Key.szKeyName << endl;
+                                t_Setup.Type = "INI_OPENBRACKET";
+                                t_Setup.Value = "{";
+                                Token_Map.push_back(t_Setup);
+                        } 
+                        if(Key.szKeyValue.empty() != true) {
+                                if(Key.szKeyValue[0] == '{') {
+                                        //Token_Map.insert({"INI_OPENBRACKET", "{" });
+                                        //cout << "INI_OPENBRACKET: " << Key.szKeyValue << endl;
+                                        t_Setup.Type = "INI_OPENBRACKET";
+                                        t_Setup.Value = "{";
+                                        Token_Map.push_back(t_Setup);
+                                } else {
+                                        //Token_Map.insert({"INI_KEYVALUE", Key.szKeyValue});
+                                        //cout << "INI_KEYVALUE: " << Key.szKeyValue << endl;
+                                        t_Setup.Type = "INI_KEYVALUE";
+                                        t_Setup.Value = Key.szKeyValue;
+                                        Token_Map.push_back(t_Setup);
                                 }
                         }
+                        if(Key.szKeyName[0] == '}') {
+                                //Token_Map.insert({"INI_ENDBRACKET","}"});
+                                //cout << "INI_END_BRACKET: " << Key.szKeyName << endl;
+                                t_Setup.Type = "INI_ENDBRACKET";
+                                t_Setup.Value = "}";
+                                Token_Map.push_back(t_Setup);
+                        } 
 
 
 
@@ -142,8 +174,114 @@ map<string, string> readIniFile(string File) {
 
 
 
+        Readfile.close();
         return Token_Map;
 }
+
+/*
+ * This function populates a given vector of provinces with their pops
+ * from history/1836.1.1/pops
+ */
+
+vector<Province> populateProvinceWPops(string File) {
+        vector<Token> Token_Map;
+        Token_Map = readIniFile(File);
+        vector<Province> ProvWPop;
+        vector<string> Listing;
+        uint uOPENBRACKET = 0;
+        uint uENDBRACKET = 0;
+
+        /*Listing = listingOfFolder("game/history/pops/1836.1.1/");
+        
+         Fixing the File Listing 
+        for(int i = 0; i < Listing.size(); i++) {
+                Listing[i] = "game/history/pops/1836.1.1/" + Listing[i];
+                cout << Listing[i] << endl;
+        }*/
+
+
+        //for(uint uFLInt = 0; uFLInt < Listing.size(); uFLInt++) {
+                /*
+                Token_Map = readIniFile(Listing[uFLInt]);
+                cout << Listing[uFLInt] << endl;
+                //cout << ProvWPop.size() << endl;
+                uint uOPENBRACKET = 0;
+                uint uENDBRACKET = 0;
+                */
+
+                for(int i = 0; i < Token_Map.size(); i++) {
+                        /* here we start reading Token_Map */
+                        if(Token_Map[i].Type.compare("INI_KEYNAME") == 0 && isNumber(Token_Map[i].Value) == true) {
+                                /* Here we begin reading within the province */
+                                Province ProvSetup;
+                                ProvSetup.uID = stoi(Token_Map[i].Value);
+                                for(;i < Token_Map.size(); i++) {
+                                        if(Token_Map[i].Type.compare("INI_OPENBRACKET") == 0) { uOPENBRACKET++; }
+                                        if(Token_Map[i].Type.compare("INI_ENDBRACKET") == 0) { uENDBRACKET++; }
+                                        //cout << uOPENBRACKET << " : " << uENDBRACKET << endl;
+                                        if(uENDBRACKET == uOPENBRACKET) { uOPENBRACKET = 0; uENDBRACKET = 0; ProvWPop.push_back(ProvSetup); break; }   /* Here we would push the finished province */
+                                        if(isKeyNamePop(Token_Map[i].Value) == true) {
+                                                Pop PopSetup;
+                                                PopSetup.szType = Token_Map[i].Value;
+                                                for(i++ ;i < Token_Map.size(); i++) {
+                                                        if(Token_Map[i].Type.compare("INI_OPENBRACKET") == 0) { /*cout << uOPENBRACKET << " : " << uENDBRACKET << endl;*/ uOPENBRACKET++; }
+                                                        if(Token_Map[i].Type.compare("INI_ENDBRACKET") == 0) { uENDBRACKET++; }
+                                                        if(uENDBRACKET == uOPENBRACKET) { uOPENBRACKET = 0; uENDBRACKET = 0; ProvSetup.Populations.push_back(PopSetup); break; }   /* Here we would push the finished pop */
+        
+        
+                                                        if(Token_Map[i].Value.compare("culture") == 0) {
+                                                                i++;
+                                                                PopSetup.szCulture = Token_Map[i].Value;
+                                                        }
+                                                        if(Token_Map[i].Value.compare("religion") == 0) {
+                                                                i++;
+                                                                PopSetup.szReligion = Token_Map[i].Value;
+                                                        }
+                                                        if(Token_Map[i].Value.compare("size") == 0) {
+                                                                i++;
+                                                                PopSetup.uSize = stoi(Token_Map[i].Value);
+                                                        }
+                                                        if(Token_Map[i].Value.compare("militancy") == 0) {
+                                                                i++;
+                                                                PopSetup.uMilitancy = stoi(Token_Map[i].Value);
+                                                        }
+                                                        if(Token_Map[i].Value.compare("rebel_type") == 0) {
+                                                                i++;
+                                                                PopSetup.szRebel_Type = Token_Map[i].Value;
+                                                        }
+        
+                                                }
+                                        } else {
+                                                //cout << "Invalid! " << Token_Map[i].Value << endl;
+                                                //Commented out to prevent spam
+                                        }
+        
+                                }
+                        }
+                }
+        
+        //}
+        
+
+
+        //cout << ProvWPop.size() << endl;
+        return ProvWPop;
+}
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
 
 
 /*
