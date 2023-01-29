@@ -24,7 +24,7 @@ typedef struct {
 
 string stripTabs(string szLine);
 
-KeyResult seperateKey(string Key);
+KeyResult seperateKey(string Key, char Delim);
 
 bool isKeyNamePop(string szLine);
 

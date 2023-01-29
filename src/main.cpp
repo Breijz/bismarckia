@@ -25,6 +25,23 @@ using namespace std;
 int main(int argc, char* argv[]) {
         Global_Market GM;
         vector<Province> Welt = populateProvinceWPops();
+
+	/*
+	for(int i = 0; i < Welt.size(); i++) {
+		for(int y = 0; y < Welt[i].Populations.size(); y++) {
+			cout << ":" << Welt[i].Populations[y].uSize << endl;
+		}
+	}
+	*/
+
+	cout << Welt.size() << endl;
+
+
+	/*for(int i = 0; i < Welt.size(); i++) {
+		for(int y = 0; y < Welt[i].Populations.size(); y++) {
+			cout << Welt[i].Populations[y].uSize << endl;
+		}
+	}*/
        
         
 
