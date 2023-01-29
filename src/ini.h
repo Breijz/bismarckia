@@ -7,6 +7,7 @@
 #include <vector>
 #include <map>
 
+#include "factory.h"
 #include "pop.h"
 #include "province.h"
 
@@ -33,5 +34,7 @@ bool isNumber(string szLine);
 vector<Token> readIniFile(string File);
 
 vector<Province> populateProvinceWPops();
+
+vector<Province> populateProvinceWAttrib(vector<Province> ProvFS, char* Folder);
 
 #endif

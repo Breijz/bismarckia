@@ -6,6 +6,7 @@
 #include <vector>
 
 #include "pop.h"
+#include "factory.h"
 
 using namespace std;
 
@@ -16,6 +17,7 @@ class Province {
         public:
         Province() {
                 uID = 0;
+		szName = "Unknown";
                 szOwner = "Unowned";
                 szController = "Unowned";
                 szGood = "Sand";
@@ -30,6 +32,7 @@ class Province {
 
         public:
                 uint uID;
+		string szName;
                 string szOwner;
                 string szController;
                 vector<string> Cores;
@@ -66,6 +69,19 @@ class Province {
                  */
                 //uint iContient;
                 //vector<string> Cores;
+
+	public:
+		void popGrowth() {
+			if(uLiferating > 30) {
+				int diff = uLiferating - 30;
+				float Increase = diff * 0.01;
+				Increase = 1 + Increase;
+				if(Increase < 1.00) { cout << "fuck\n"; return; }
+				for(int i = 0; i < Populations.size(); i++) {
+					Populations[i].uSize = Populations[i].uSize * Increase;
+				}
+			}
+		}
 };
 
 #endif

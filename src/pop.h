@@ -74,7 +74,6 @@ class Pop {
                 string szRebelType;
                 float fMilitancy;
                 uint uSize;
-
 };
 
 #endif

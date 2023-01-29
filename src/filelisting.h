@@ -5,4 +5,4 @@
 
 using namespace std;
 
-vector<string> listingOfFolder(char* Directory);
+vector<string> listingOfFolder(char* Directory, bool keepFilePath);

@@ -12,7 +12,7 @@ using namespace std;
     NOTE: This is inherited from serviced/src/getServices.cpp   -Breizh
 */
 
-vector<string> listingOfFolder(char* Directory) {
+vector<string> listingOfFolder(char* Directory, bool keepFilePath) {
     vector<string> Listing;
         if(access(Directory, F_OK) != 0) {
                 cout << "File Doesnt Exist: " << Directory << endl;
@@ -33,8 +33,10 @@ vector<string> listingOfFolder(char* Directory) {
     }
 
     /* Fixes the Listing */
-    for(int i = 0; i < Listing.size(); i++) {
-            Listing[i] = Directory + Listing[i];
+    if(keepFilePath == true) {
+    	for(int i = 0; i < Listing.size(); i++) {
+		Listing[i] = Directory + Listing[i];
+    	}
     }
     
     return Listing;
