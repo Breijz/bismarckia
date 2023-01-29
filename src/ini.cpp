@@ -29,7 +29,7 @@ using namespace std;
 string stripTabs(string szLine) {
     string Ans;
     for(int i = 0; i < szLine.size(); i++) {
-        if(szLine[i] != '\t' && szLine[i] != ' ' && szLine[i] != '\r') {
+        if(szLine[i] != '\t' && szLine[i] != ' ' /*&& szLine[i] != '\r'*/) {
             Ans.push_back(szLine[i]);
         }
     }
@@ -47,9 +47,9 @@ KeyResult seperateKey(string Key, char Delim) {
     for(int i = 0; i < Key.size(); i++) {
         if(Key[i] == Delim) {
             Side = true;
-        } else if(Side == false && Key[i] != ' ' && Key[i] != '\r') {
+        } else if(Side == false && Key[i] != ' ' /*&& Key[i] != '\r'*/) {
             SepKey.szKeyName.push_back(Key[i]);
-        } else if(Side == true && Key[i] != ' ' && Key[i] != '\r') {
+        } else if(Side == true && Key[i] != ' ' /*&& Key[i] != '\r'*/) {
             SepKey.szKeyValue.push_back(Key[i]);
         }
     }
@@ -331,25 +331,25 @@ vector<Province> populateProvinceWAttrib(vector<Province> ProvFS, char* File) {
                                                 if(Token_Map[z].Value.compare("owner") == 0) {
 							z++;
                                                         ProvFS[i].szOwner = Token_Map[z].Value;
-                                                } else
+                                                } 
                                                 if(Token_Map[z].Value.compare("controller") == 0) {
 							z++;
                                                         ProvFS[i].szController = Token_Map[z].Value;
-                                                } else
+                                                } 
                                                 if(Token_Map[z].Value.compare("add_core") == 0) {
 							z++;
                                                         ProvFS[i].Cores.push_back(Token_Map[z].Value);
-                                                } else
+                                                }
                                                 if(Token_Map[z].Value.compare("trade_goods") == 0 || Token_Map[z].Value.compare("trade_goods\r") == 0) {
 							z++;
                                                         ProvFS[i].szGood = Token_Map[z].Value;
-                                                } else
+                                                }
                                                 if(Token_Map[z].Value.compare("life_rating") == 0) {
 							z++;
                                                         ProvFS[i].uLiferating = stoi(Token_Map[z].Value);
-                                                } else
+                                                }
                                                 if(Token_Map[z].Value.compare("state_building") == 0) {
-							break;
+						}
                                                         /*Factory FactSetup;
                                                         for(;z < Token_Map.size(); z++) {
                                                                 if(Token_Map[z].Value[0] == '}') {
@@ -369,7 +369,7 @@ vector<Province> populateProvinceWAttrib(vector<Province> ProvFS, char* File) {
                                                                 
                                                         }
                                                         ProvFS[i].Factories.push_back(FactSetup);*/
-                                                }
+                                                //}
 
                                 }
 				//cout << "Done With: " << ProvID << endl;
