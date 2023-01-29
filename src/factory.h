@@ -1,4 +1,4 @@
-#ifdef factory_H
+#ifndef factory_H
 #define factory_H
 
 #include <iostream>

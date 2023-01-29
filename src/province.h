@@ -22,7 +22,10 @@ class Province {
                 szController = "Unowned";
                 szGood = "Sand";
                 uLiferating = 35;
-                uNavelBase = 0;
+                uNavalBase = 0;
+		uFort = 0;
+		bColonial = true;
+		szTerrain = "Plains";
                 //NOTE: Unused, for now :3      -Breizh
                 //szProvince = "NULL";
                 //szRegion = "NULL"; see line 77
@@ -38,7 +41,10 @@ class Province {
                 vector<string> Cores;
                 string szGood;
                 uint uLiferating;
-                uint uNavelBase;
+                uint uNavalBase;
+		uint uFort;
+		bool bColonial;
+		string szTerrain;
                 vector<Pop> Populations;
                 //string szProvince;
                 //string szRegion; moved to State Class
