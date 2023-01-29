@@ -105,6 +105,33 @@ bool isNumber(string szLine) {
     return true;
 }
 
+vector<string> readWCR(string File) {
+	vector<string> Result;
+	string szLine;
+	string szFix;
+	fstream Readfile;
+	Readfile.open(File);
+
+	while(getline(Readfile, szLine)) {
+		for(int i = 0; i < szLine.size(); i++) {
+			if(szLine[i] != '\r' || szLine[i] != '\n') {
+				szFix.push_back(szLine[i]);
+			} else if(szLine[i] == '\r' || szLine[i] == '\n') {
+				Result.push_back(szFix);
+				szFix.erase(0, szFix.size());
+				break;
+			}
+		}
+		Result.push_back(szFix);
+		szFix.erase(0, szFix.size());
+
+	}
+	
+	
+
+	return Result;
+}
+
 
 /*
  * This code is *alot* more generic, its nothing more than a tokeniser
@@ -115,22 +142,25 @@ bool isNumber(string szLine) {
 
 vector<Token> readIniFile(string File) {
         ifstream Readfile;
-        string szLine;
         KeyResult Key;
         Token t_Setup;
         vector<Token> Token_Map;
-        Readfile.open(File);
+	string szLine;
+
+	vector<string> LinesOfFile = readWCR(File);
 
 
-        while(getline(Readfile, szLine)) {
+        //while(getline(Readfile, szLine)) {
+	for(int i = 0; i < LinesOfFile.size(); i++) {
+		szLine = LinesOfFile[i];
                 t_Setup.Type.erase(t_Setup.Type.begin(), t_Setup.Type.end());
                 t_Setup.Value.erase(t_Setup.Value.begin(), t_Setup.Value.end());
                 Key.szKeyName.erase(Key.szKeyName.begin(), Key.szKeyName.end());
                 Key.szKeyValue.erase(Key.szKeyValue.begin(), Key.szKeyValue.end());
                 szLine = stripTabs(szLine);
-                if(szLine[0] != '#' && szLine[0] != '\r') {
+                if(szLine[0] != '#') {
                         Key = seperateKey(szLine, '=');
-                        if(Key.szKeyName.empty() != true && Key.szKeyName.compare("}\r") != 0) {
+                        if(Key.szKeyName.empty() != true) {
                                 //Token_Map.insert({"INI_KEYNAME", Key.szKeyName});
                                 //cout << "INI_KEYNAME: " << Key.szKeyName << endl;
                                 t_Setup.Type = "INI_KEYNAME";
@@ -175,7 +205,6 @@ vector<Token> readIniFile(string File) {
 
 
 
-        Readfile.close();
         return Token_Map;
 }
 

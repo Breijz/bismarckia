@@ -26,6 +26,7 @@ using namespace std;
 int main(int argc, char* argv[]) {
         Global_Market GM;
         vector<Province> Welt = populateProvinceWPops();
+	
 
 	Welt = populateProvinceWAttrib(Welt, "game/history/provinces/africa/");
 	Welt = populateProvinceWAttrib(Welt, "game/history/provinces/asia/");
