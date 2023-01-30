@@ -12,6 +12,11 @@ using namespace std;
 
 
 
+typedef struct {
+	string szType;
+			bool bController;
+} Revolt;
+
 class Province {
 
         public:
@@ -24,7 +29,10 @@ class Province {
                 uLiferating = 35;
                 uNavalBase = 0;
 		uFort = 0;
+		uRailroad = 0;
 		bColonial = true;
+		bColony = true;
+		bIsSlave = true;
 		szTerrain = "Plains";
                 //NOTE: Unused, for now :3      -Breizh
                 //szProvince = "NULL";
@@ -43,9 +51,13 @@ class Province {
                 uint uLiferating;
                 uint uNavalBase;
 		uint uFort;
+		uint uRailroad;
 		bool bColonial;
+		bool bColony;
+		bool bIsSlave;
 		string szTerrain;
                 vector<Pop> Populations;
+		vector<Revolt> Rebellions;
                 //string szProvince;
                 //string szRegion; moved to State Class
                 /*

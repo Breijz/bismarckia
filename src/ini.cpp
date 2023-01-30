@@ -9,6 +9,7 @@
 #include "factory.h"
 #include "pop.h"
 #include "province.h"
+#include "state.h"
 #include "filelisting.h"
 
 
@@ -453,19 +454,22 @@ vector<Province> populateProvinceWAttrib(vector<Province> ProvFS, char* File) {
 				if(Token_Map[z].Value.compare("fort") == 0) {
 					ProvFS[ProvPos].uFort = stoi(Token_Map[z+1].Value);
 				} else
+				if(Token_Map[z].Value.compare("railroad") == 0) {
+					ProvFS[ProvPos].uRailroad = stoi(Token_Map[z+1].Value);
+				} else
 				if(Token_Map[z].Value.compare("state_building") == 0) {
 					Factory FactSetup;
 					for(z++; z < Token_Map.size(); z++) {
 						if(Token_Map[z].Type.compare("INI_ENDBRACKET") == 0) { break; }
 						
 						if(Token_Map[z].Value.compare("level") == 0) {
-							FactSetup[z+1].uLevel = stoi(Token_Map[z+1].Value);
+							FactSetup.uLevel = stoi(Token_Map[z+1].Value);
 						}
 						if(Token_Map[z].Value.compare("building") == 0) {
-							FactSetup[z+1].szBuilding= Token_Map[z+1].Value;
+							FactSetup.szBuilding= Token_Map[z+1].Value;
 						}
 						if(Token_Map[z].Value.compare("upgrade") == 0) {
-							if(Token_Map[z+1].Value.compare("yes") {
+							if(Token_Map[z+1].Value.compare("yes") == 0) {
 								FactSetup.bUpgrade = true;
 							} else {
 								FactSetup.bUpgrade = false;	
@@ -473,10 +477,45 @@ vector<Province> populateProvinceWAttrib(vector<Province> ProvFS, char* File) {
 						}
 
 					}
+					//ProvFS[ProvPos].Factories.push_back(FactSetup);
+
+				} else
+				if(Token_Map[z].Value.compare("colony") == 0) {
+					if(Token_Map[z+1].Value.compare("yes") == 0) {
+						ProvFS[ProvPos].bColony = true;
+					} else {
+						ProvFS[ProvPos].bColony = false;
+					}
+				} else
+				if(Token_Map[z].Value.compare("is_slave") == 0) {
+					if(Token_Map[z+1].Value.compare("yes") == 0) {
+						ProvFS[ProvPos].bIsSlave = true;
+					} else {
+						ProvFS[ProvPos].bIsSlave = false;
+					}
+				} else
+				if(Token_Map[z].Value.compare("revolt") == 0) {
+					Revolt RevSetup;
+					for(z++; z < Token_Map.size(); z++) {
+						if(Token_Map[z].Type.compare("INI_ENDBRACKET") == 0) { break; }
+						
+						if(Token_Map[z].Value.compare("type") == 0) {
+							RevSetup.szType = Token_Map[z+1].Value;
+						}
+						if(Token_Map[z].Value.compare("controller") == 0) {
+							if(Token_Map[z+1].Value.compare("yes") == 0) {
+								RevSetup.bController = true;
+							} else {
+								RevSetup.bController = false;
+							}
+						}
+					}
+					ProvFS[ProvPos].Rebellions.push_back(RevSetup);
 
 				} else
 				if(Token_Map[z].Value.compare("trade_goods") == 0) {
-					ProvFS[ProvPos].szGood = Token_Map[z+1].Value;
+					ProvFS[ProvPos].szGood = "FUCKKCK";
+					//ProvFS[ProvPos].szGood = Token_Map[z+1].Value;
 				} else {
 					cout << ProvID << ": " <<  "|" << Token_Map[z].Value << " = " << Token_Map[z+1].Value << "|" << endl;
 				}
@@ -488,6 +527,15 @@ vector<Province> populateProvinceWAttrib(vector<Province> ProvFS, char* File) {
         return ProvFS;
 }
 
+
+vector<State> orgIntoState(vector<Province> Welt) {
+	vector<Token> Token_Map = readIniFile("game/map/region.txt");
+	vector<State> Staten;
+	for(int i = 0 ; i < Token_Map.size(); i++) {
+		cout << Token_Map[i].Type << " : " <<  Token_Map[i].Value << endl;
+	}
+	return Staten;
+}
 
 
 

@@ -10,6 +10,7 @@
 #include "factory.h"
 #include "pop.h"
 #include "province.h"
+#include "state.h"
 
 using namespace std;
 
@@ -36,5 +37,7 @@ vector<Token> readIniFile(string File);
 vector<Province> populateProvinceWPops();
 
 vector<Province> populateProvinceWAttrib(vector<Province> ProvFS, char* Folder);
+
+vector<State> orgIntoState(vector<Province> Welt);
 
 #endif
