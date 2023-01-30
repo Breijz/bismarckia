@@ -24,6 +24,14 @@ using namespace std;
 
 
 int main(int argc, char* argv[]) {
+	vector<Province> Welt = populateProvinceWPops();
+	for(int i = 0; i < Welt.size(); i++) {
+		cout << i << endl;
+		cout << Welt[i].uID << endl;
+	}
+	cout << "Fuck\n";
+	return 0;
+	/*
         Global_Market GM;
         vector<Province> Welt = populateProvinceWPops();
 	
@@ -60,7 +68,6 @@ int main(int argc, char* argv[]) {
 	}
 
 	
-	/*
 	for(int D = 0; D < (365 * (2000-1836)); D++) {
 		for(int x = 0; x < Welt.size(); x++) {
 			Welt[x].popGrowth();

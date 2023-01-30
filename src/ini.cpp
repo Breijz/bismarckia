@@ -167,16 +167,19 @@ vector<Token> readIniFile(string File) {
                                 t_Setup.Type = "INI_KEYNAME";
                                 t_Setup.Value = Key.szKeyName;
                                 Token_Map.push_back(t_Setup);
-                        }
-                        if(Key.szKeyName[0] == '{') {
+                        } else
+                        if(Key.szKeyName[0] == '{' || Key.szKeyValue[0] == '{') {
                                 //Token_Map.insert({"INI_OPENBRACKET", "{"});
                                 //cout << "INI_OPENBRACKET: " << Key.szKeyName << endl;
                                 t_Setup.Type = "INI_OPENBRACKET";
                                 t_Setup.Value = "{";
                                 Token_Map.push_back(t_Setup);
-                        } 
+                        } else
                         if(Key.szKeyValue.empty() != true) {
-                                if(Key.szKeyValue[0] == '{') {
+                        	t_Setup.Type = "INI_KEYVALUE";
+                        	t_Setup.Value = Key.szKeyValue;
+                                Token_Map.push_back(t_Setup);
+                                /*if(Key.szKeyValue[0] == '{') {
                                         //Token_Map.insert({"INI_OPENBRACKET", "{" });
                                         //cout << "INI_OPENBRACKET: " << Key.szKeyValue << endl;
                                         t_Setup.Type = "INI_OPENBRACKET";
@@ -188,8 +191,8 @@ vector<Token> readIniFile(string File) {
                                         t_Setup.Type = "INI_KEYVALUE";
                                         t_Setup.Value = Key.szKeyValue;
                                         Token_Map.push_back(t_Setup);
-                                }
-                        }
+                                }*/
+                        } else
                         if(Key.szKeyName[0] == '}') {
                                 //Token_Map.insert({"INI_ENDBRACKET","}"});
                                 //cout << "INI_END_BRACKET: " << Key.szKeyName << endl;
@@ -283,6 +286,7 @@ vector<Province> populateProvinceWPops() {
 							}
 							if(Token_Map[i].Type.compare("INI_KEYVALUE") != 0 && Token_Map[i].Value.compare("size") == 0) {
 								i++;
+								cout << "Testing! : " << Token_Map[i].Value << endl;
 								PopSetup.uSize = stoi(Token_Map[i].Value);
 							}
 							if(Token_Map[i].Type.compare("INI_KEYVALUE") != 0 && Token_Map[i].Value.compare("militancy") == 0) {
