@@ -29,11 +29,9 @@ int main(int argc, char* argv[]) {
 		cout << i << endl;
 		cout << Welt[i].uID << endl;
 	}
-	cout << "Fuck\n";
+	cout << Welt.size() << endl;
 	return 0;
-	/*
         Global_Market GM;
-        vector<Province> Welt = populateProvinceWPops();
 	
 
 	Welt = populateProvinceWAttrib(Welt, "game/history/provinces/africa/");
@@ -82,8 +80,6 @@ int main(int argc, char* argv[]) {
 		}
 	}
 	cout << "World Population: " << WorldPop << endl;
-	*/
-
         
 
 

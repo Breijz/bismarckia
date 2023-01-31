@@ -30,7 +30,7 @@ using namespace std;
 string stripTabs(string szLine) {
     string Ans;
     for(int i = 0; i < szLine.size(); i++) {
-        if(szLine[i] != '\t' && szLine[i] != ' ' /*&& szLine[i] != '\r'*/) {
+        if(szLine[i] != '\t' && szLine[i] != ' ' && szLine[i] != '\r') {
             Ans.push_back(szLine[i]);
         }
     }
@@ -141,7 +141,7 @@ vector<string> readWCR(string File) {
  * instead as part of another function...       -Breizh
  */
 
-vector<Token> readIniFile(string File) {
+/*vector<Token> readIniFile(string File) {
         ifstream Readfile;
         KeyResult Key;
         Token t_Setup;
@@ -161,13 +161,6 @@ vector<Token> readIniFile(string File) {
                 szLine = stripTabs(szLine);
                 if(szLine[0] != '#') {
                         Key = seperateKey(szLine, '=');
-                        if(Key.szKeyName.empty() != true) {
-                                //Token_Map.insert({"INI_KEYNAME", Key.szKeyName});
-                                //cout << "INI_KEYNAME: " << Key.szKeyName << endl;
-                                t_Setup.Type = "INI_KEYNAME";
-                                t_Setup.Value = Key.szKeyName;
-                                Token_Map.push_back(t_Setup);
-                        } else
                         if(Key.szKeyName[0] == '{' || Key.szKeyValue[0] == '{') {
                                 //Token_Map.insert({"INI_OPENBRACKET", "{"});
                                 //cout << "INI_OPENBRACKET: " << Key.szKeyName << endl;
@@ -179,20 +172,7 @@ vector<Token> readIniFile(string File) {
                         	t_Setup.Type = "INI_KEYVALUE";
                         	t_Setup.Value = Key.szKeyValue;
                                 Token_Map.push_back(t_Setup);
-                                /*if(Key.szKeyValue[0] == '{') {
-                                        //Token_Map.insert({"INI_OPENBRACKET", "{" });
-                                        //cout << "INI_OPENBRACKET: " << Key.szKeyValue << endl;
-                                        t_Setup.Type = "INI_OPENBRACKET";
-                                        t_Setup.Value = "{";
-                                        Token_Map.push_back(t_Setup);
-                                } else {
-                                        //Token_Map.insert({"INI_KEYVALUE", Key.szKeyValue});
-                                        //cout << "INI_KEYVALUE: " << Key.szKeyValue << endl;
-                                        t_Setup.Type = "INI_KEYVALUE";
-                                        t_Setup.Value = Key.szKeyValue;
-                                        Token_Map.push_back(t_Setup);
-                                }*/
-                        } else
+                       } else
                         if(Key.szKeyName[0] == '}') {
                                 //Token_Map.insert({"INI_ENDBRACKET","}"});
                                 //cout << "INI_END_BRACKET: " << Key.szKeyName << endl;
@@ -200,6 +180,13 @@ vector<Token> readIniFile(string File) {
                                 t_Setup.Value = "}";
                                 Token_Map.push_back(t_Setup);
                         } 
+                        if(Key.szKeyName.empty() != true && Key.szKeyValue[0] != '}') {
+                                //Token_Map.insert({"INI_KEYNAME", Key.szKeyName});
+                                //cout << "INI_KEYNAME: " << Key.szKeyName << endl;
+                                t_Setup.Type = "INI_KEYNAME";
+                                t_Setup.Value = Key.szKeyName;
+                                Token_Map.push_back(t_Setup);
+                        }
 
 
 
@@ -210,6 +197,56 @@ vector<Token> readIniFile(string File) {
 
 
         return Token_Map;
+}*/
+
+vector<Token> readIniFile(string File) {
+	ifstream Readfile;
+	vector<Token> Token_Map;
+
+	Readfile.open(File);
+	string szLine;
+	Token TokenSetup;
+	KeyResult Key;
+	size_t pos;
+	
+	while(getline(Readfile, szLine)) {
+		szLine = stripTabs(szLine);
+		if(szLine.empty() == false && szLine[0] != '#') {
+			//From https://stackoverflow.com/questions/14265581/parse-split-a-string-in-c-using-string-delimiter-standard-c
+			while((pos = szLine.find("=")) != string::npos) {
+				Key.szKeyName = szLine.substr(0, pos);
+				szLine.erase(0, (pos + 1));
+			}
+			Key.szKeyValue = szLine;
+				
+			/* szKeyName is never a { or } so we dont need to worry about it ^-^ */
+			if(Key.szKeyName.empty() == true) {
+				cout << "[Error] src/ini.cpp: szKeyName Empty! " << Key.szKeyName << " : " << Key.szKeyValue << " aus " << File << endl;
+			} else {
+				TokenSetup.Type = "INI_KEYNAME";
+				TokenSetup.Value = Key.szKeyName;
+				Token_Map.push_back(TokenSetup);
+			}
+
+			/* szKeyValue is sometimes { or } so we must handle them first before szKeyValue */
+			if(Key.szKeyValue.compare("}") == 0) {
+				TokenSetup.Type = "INI_ENDBRACKET";
+				TokenSetup.Value = Key.szKeyValue;
+				Token_Map.push_back(TokenSetup);
+			} else
+			if(Key.szKeyValue.compare("{") == 0) {
+				TokenSetup.Type = "INI_OPENBRACKET";
+				TokenSetup.Value = Key.szKeyValue;
+				Token_Map.push_back(TokenSetup);
+			} else if(Key.szKeyValue.empty() == false) {
+				TokenSetup.Type = "INI_KEYVALUE";
+				TokenSetup.Value = Key.szKeyValue;
+				Token_Map.push_back(TokenSetup);
+			}
+		} 
+	}
+	Readfile.close();
+	return Token_Map;
 }
 
 /*
@@ -249,60 +286,65 @@ vector<Province> populateProvinceWPops() {
 
 
 	for(uint uFLInt = 0; uFLInt < Listing.size(); uFLInt++) {
+		cout << Listing[uFLInt] << endl;
 		uint uEndBracket = 0;
 		uint uOpenBracket = 0;
 		vector<Token> Token_Map = readIniFile(Listing[uFLInt]);
 		/* Begin Looping through TokenMap  */
+		cout << Token_Map.size() << endl;
 		for(int i = 0; i < Token_Map.size(); i++) {
+			if(Token_Map[i].Type.compare("INI_OPENBRACKET") == 0) { uOpenBracket++; }
+			if(Token_Map[i].Type.compare("INI_ENDBRACKET") == 0) { uEndBracket++; }
 			/* Check if were reading a province ID */
 
 			if(Token_Map[i].Type.compare("INI_KEYNAME") == 0 && isNumber(Token_Map[i].Value) == true) {
-				if(Token_Map[i].Type.compare("INI_OPENBRACKET") == 0) { uOpenBracket++; }
-				if(Token_Map[i].Type.compare("INI_ENDBRACKET") == 0) { uEndBracket++; }
 				Province ProvSetup;
 				ProvSetup.uID = stoi(Token_Map[i].Value);
 				//cout << "Reading: " << ProvSetup.uID << endl;
 				//cout << "OPEN: " <<  uOpenBracket << endl;
 				//cout << "END: "<< uEndBracket << endl;
 				/* Begin Looping Within Province  */
-				for(i++; i < Token_Map.size(); i++) {
-					if(Token_Map[i].Type.compare("INI_OPENBRACKET") == 0) { uOpenBracket++; }
-					if(Token_Map[i].Type.compare("INI_ENDBRACKET") == 0) { uEndBracket++; }
+				for(int z = i + 1; z < Token_Map.size(); z++) {
+					if(Token_Map[z].Type.compare("INI_OPENBRACKET") == 0) { uOpenBracket++; }
+					if(Token_Map[z].Type.compare("INI_ENDBRACKET") == 0) { uEndBracket++; }
 
-					if(isKeyNamePop(Token_Map[i].Value) == true) {
+					if(isKeyNamePop(Token_Map[z].Value) == true) {
 						Pop PopSetup;
-						PopSetup.szType = Token_Map[i].Value;
+						PopSetup.szType = Token_Map[z].Value;
 						/* Begin Looping Within Pop */
-						for(i++; i < Token_Map.size(); i++) {
-							if(Token_Map[i].Type.compare("INI_OPENBRACKET") == 0) { uOpenBracket++; }
-
-							if(Token_Map[i].Type.compare("INI_KEYVALUE") != 0 && Token_Map[i].Value.compare("culture") == 0) {
-								i++;
-								PopSetup.szCulture = Token_Map[i].Value;
-							}
-							if(Token_Map[i].Type.compare("INI_KEYVALUE") != 0 && Token_Map[i].Value.compare("religion") == 0) {
-								i++;
-								PopSetup.szReligion = Token_Map[i].Value;
-							}
-							if(Token_Map[i].Type.compare("INI_KEYVALUE") != 0 && Token_Map[i].Value.compare("size") == 0) {
-								i++;
-								cout << "Testing! : " << Token_Map[i].Value << endl;
-								PopSetup.uSize = stoi(Token_Map[i].Value);
-							}
-							if(Token_Map[i].Type.compare("INI_KEYVALUE") != 0 && Token_Map[i].Value.compare("militancy") == 0) {
-								i++;
-								PopSetup.fMilitancy = stof(Token_Map[i].Value);
-							}
-							if(Token_Map[i].Type.compare("INI_KEYVALUE") != 0 && Token_Map[i].Value.compare("rebel_type") == 0) {
-								i++;
-								PopSetup.szRebelType = Token_Map[i].Value;
-							}
-							//if(uOpenBracket == uEndBracket) {uEndBracket = 0; uOpenBracket = 0;  ProvSetup.Populations.push_back(PopSetup); cout << "PopBreaking...\n";  break; }
-							if(Token_Map[i].Type.compare("INI_ENDBRACKET") == 0) { 
-								uEndBracket++; 
-								ProvSetup.Populations.push_back(PopSetup);
-								//cout << "Pop Breaking...\n";
-								break;
+						for(z++; z < Token_Map.size(); z++) {
+							if(Token_Map[z].Type.compare("INI_OPENBRACKET") == 0) { uOpenBracket++; }
+							
+							if(Token_Map[z].Type.compare("INI_KEYNAME") == 0 && Token_Map[z+1].Type.compare("INI_KEYVALUE") == 0) {
+								if(Token_Map[z].Value.compare("culture") == 0) {
+									z++;
+									PopSetup.szCulture = Token_Map[z].Value;
+								}
+								if(Token_Map[z].Value.compare("religion") == 0) {
+									z++;
+									PopSetup.szReligion = Token_Map[z].Value;
+								}
+								if(Token_Map[z].Value.compare("size") == 0) {
+									//cout << Token_Map[i].Value << endl;
+									z++;
+									//cout << "Testing! : " << Token_Map[i].Type << " : " << Token_Map[i].Value << endl;
+									PopSetup.uSize = stoi(Token_Map[z].Value);
+								}
+								if(Token_Map[z].Value.compare("militancy") == 0) {
+									z++;
+									PopSetup.fMilitancy = stof(Token_Map[z].Value);
+								}
+								if(Token_Map[z].Value.compare("rebel_type") == 0) {
+									z++;
+									PopSetup.szRebelType = Token_Map[z].Value;
+								}
+								//if(uOpenBracket == uEndBracket) {uEndBracket = 0; uOpenBracket = 0;  ProvSetup.Populations.push_back(PopSetup); cout << "PopBreaking...\n";  break; }
+								if(Token_Map[z].Type.compare("INI_ENDBRACKET") == 0) { 
+									uEndBracket++; 
+									ProvSetup.Populations.push_back(PopSetup);
+									//cout << "Pop Breaking...\n";
+									break;
+								}
 							}
 						}
 					} else {
@@ -312,8 +354,11 @@ vector<Province> populateProvinceWPops() {
 						uEndBracket = 0;
 						uOpenBracket = 0;
 						ProvWPop.push_back(ProvSetup); 
-						//cout << "ProvBreaking...\n";  
+						cout << "ProvBreaking...\n";  
 						break; 
+					} else {
+						uEndBracket = 0;
+						uOpenBracket = 0;
 					}
 				}
 			} 
