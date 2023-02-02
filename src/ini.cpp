@@ -305,6 +305,7 @@ vector<Province> populateProvinceWPops() {
 			uint uZ = ProvPositions[i];
 			//cout << "uZ is ... " << uZ << endl;
 			ProvSetup.uID = stoi(Token_Map[uZ].Value);
+			cout << "Province ID: " << ProvSetup.uID << endl;
 
 
 			// Start reading the pops of the Province 
@@ -314,13 +315,13 @@ vector<Province> populateProvinceWPops() {
 				
 				if(isKeyNamePop(Token_Map[z].Value) == true) {
 					PopSetup.szType = Token_Map[z].Value;
-					cout << PopSetup.szType << endl;
+					//cout << PopSetup.szType << endl;
 					// Start reading one of the Pops
 					for(z++;;z++) {
 						if(Token_Map[z].Type.compare("INI_OPENBRACKET") == 0) { uOpenBracket++; }
 						if(Token_Map[z].Type.compare("INI_ENDBRACKET") == 0) { 
 							uEndBracket++; 
-							cout << "Pushing POP...\n";
+							//cout << "Pushing POP...\n";
 							ProvSetup.Populations.push_back(PopSetup);
 							break; 
 						}
@@ -330,26 +331,25 @@ vector<Province> populateProvinceWPops() {
 							if(Token_Map[z].Value.compare("culture") == 0) {
 								z++;
 								PopSetup.szCulture = Token_Map[z].Value;
-								cout << PopSetup.szCulture << endl;
+								//cout << PopSetup.szCulture << endl;
 							}
 							if(Token_Map[z].Value.compare("religion") == 0) {
 								z++;
 								PopSetup.szReligion = Token_Map[z].Value;
-								cout << PopSetup.szReligion << endl;
+								//cout << PopSetup.szReligion << endl;
 							}
 							if(Token_Map[z].Value.compare("size") == 0) {
 								z++;
 								PopSetup.uSize = stoi(Token_Map[z].Value);
-								cout << PopSetup.uSize << endl;
+								//cout << PopSetup.uSize << endl;
 							}
 						}
 					}
-					cout << endl;
 					if(Token_Map[z+1].Type.compare("INI_ENDBRACKET") == 0) {
 						cout << "Pushing Province...\n";
-						ProvWPop.push_back(ProvSetup);
-						uEndBracket = 0;
-						uOpenBracket = 0;
+						//ProvWPop.push_back(ProvSetup);
+						//uEndBracket = 0;
+						//uOpenBracket = 0;
 						break;
 					} else {
 						//cout << "Debug: " << uEndBracket << " : " << uOpenBracket << endl;
@@ -358,6 +358,11 @@ vector<Province> populateProvinceWPops() {
 					}
 				}
 			}
+			// This is stupid, but required as otherwise Provinces 77 and 265 dont get pushed into ProvWPop
+			// Why these? not sure, and it shall remain a mystery i suppose
+			ProvWPop.push_back(ProvSetup);
+			uEndBracket = 0;
+			uOpenBracket = 0;
 
 
 		}
@@ -383,6 +388,9 @@ vector<Province> populateProvinceWPops() {
 }*/
 
 
+// Some province files (136, 1107, 232, 123, 211, 219, 200, and 116) do not work due to '\r' line terminators...
+// Keeping '\r' in the token map causes a seg. fault, Im not quite sure how to fix this at the moment, so I wont
+// handle it for now, but it needs to be handled.
 
 vector<Province> populateProvinceWAttrib(vector<Province> ProvWPop, char* File) {
 	vector<Province> ProvFS = ProvWPop;
