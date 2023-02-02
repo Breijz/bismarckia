@@ -36,7 +36,7 @@ vector<Token> readIniFile(string File);
 
 vector<Province> populateProvinceWPops();
 
-vector<Province> populateProvinceWAttrib(vector<Province> ProvFS, char* Folder);
+vector<Province> populateProvinceWAttrib(vector<Province> ProvWPop, char* Folder);
 
 vector<State> orgIntoState(vector<Province> Welt);
 

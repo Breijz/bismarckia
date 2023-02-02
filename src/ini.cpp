@@ -218,31 +218,43 @@ vector<Token> readIniFile(string File) {
 				szLine.erase(0, (pos + 1));
 			}
 			Key.szKeyValue = szLine;
-				
-			/* szKeyName is never a { or } so we dont need to worry about it ^-^ */
-			if(Key.szKeyName.empty() == true) {
-				cout << "[Error] src/ini.cpp: szKeyName Empty! " << Key.szKeyName << " : " << Key.szKeyValue << " aus " << File << endl;
-			} else {
+
+			//cout << Key.szKeyName << " : " << Key.szKeyValue << endl;
+			
+			
+			
+
+			// szKeyName is never a { or } so we dont need to worry about it ^-^ 
+			if(Key.szKeyName.empty() == false) {
 				TokenSetup.Type = "INI_KEYNAME";
 				TokenSetup.Value = Key.szKeyName;
 				Token_Map.push_back(TokenSetup);
-			}
+			} /*else {
+				cout << "[Error] src/ini.cpp: szKeyName Empty! " << Key.szKeyName << " : " << Key.szKeyValue << " aus " << File << endl;
+			}*/
 
-			/* szKeyValue is sometimes { or } so we must handle them first before szKeyValue */
-			if(Key.szKeyValue.compare("}") == 0) {
-				TokenSetup.Type = "INI_ENDBRACKET";
-				TokenSetup.Value = Key.szKeyValue;
-				Token_Map.push_back(TokenSetup);
-			} else
-			if(Key.szKeyValue.compare("{") == 0) {
-				TokenSetup.Type = "INI_OPENBRACKET";
-				TokenSetup.Value = Key.szKeyValue;
-				Token_Map.push_back(TokenSetup);
-			} else if(Key.szKeyValue.empty() == false) {
+			
+			if(Key.szKeyValue.empty() == false && Key.szKeyValue[0] != '{' && Key.szKeyValue[0] != '}') {
 				TokenSetup.Type = "INI_KEYVALUE";
 				TokenSetup.Value = Key.szKeyValue;
 				Token_Map.push_back(TokenSetup);
 			}
+
+			// szKeyValue is sometimes { or } so we must handle them first before szKeyValue 
+			if(Key.szKeyValue.compare("}") == 0) {
+				TokenSetup.Type = "INI_ENDBRACKET";
+				TokenSetup.Value = Key.szKeyValue;
+				Token_Map.push_back(TokenSetup);
+			}
+			if(Key.szKeyValue.compare("{") == 0) {
+				TokenSetup.Type = "INI_OPENBRACKET";
+				TokenSetup.Value = Key.szKeyValue;
+				Token_Map.push_back(TokenSetup);
+			} 
+
+
+			Key.szKeyName.erase(0, string::npos);
+			Key.szKeyValue.erase(0, string::npos);
 		} 
 	}
 	Readfile.close();
@@ -254,31 +266,7 @@ vector<Token> readIniFile(string File) {
  * from history/1836.1.1/pops
  */
 
-/*vector<Province> populateProvinceWPops() {
-	vector<string> Listing = listingOfFolder("game/history/pops/1836.1.1/, true);
-	vector<Province> ProvWPop;
 
-	for(uint uFLInt = 0; uFLInt < Listing.size(); uFLInt++) {
-		uint uEndBracket = 0;
-		uint uOpenBracket = 0;
-		vector<Token> Token_Map = readIniFile(Listing[uFLInt]);
-
-		// begin reading through token_map 
-		for(int z = 0; z < Token_Map.size(); z++) {
-			if(Token_Map[z].Type.compare("INI_KEYNAME") == 0 && isNumber(Token_Map[z].Value) == true) {
-				Province ProvSetup;
-				ProvSetup.uID = stoi(Token_Map[z].Value);
-
-				// Begin looping through the province
-				for(z++; z< Token_Map.size(); z++) {
-
-				}
-			}
-		}
-	}
-
-	return ProvWPop;
-}*/
 
 vector<Province> populateProvinceWPops() {
 	vector<string> Listing = listingOfFolder("game/history/pops/1836.1.1/", true);
@@ -290,84 +278,88 @@ vector<Province> populateProvinceWPops() {
 		uint uEndBracket = 0;
 		uint uOpenBracket = 0;
 		vector<Token> Token_Map = readIniFile(Listing[uFLInt]);
-		/* Begin Looping through TokenMap  */
-		cout << Token_Map.size() << endl;
+		vector<int> ProvPositions;
+		// Begin Looping through TokenMap 
 		for(int i = 0; i < Token_Map.size(); i++) {
-			if(Token_Map[i].Type.compare("INI_OPENBRACKET") == 0) { uOpenBracket++; }
-			if(Token_Map[i].Type.compare("INI_ENDBRACKET") == 0) { uEndBracket++; }
-			/* Check if were reading a province ID */
-
 			if(Token_Map[i].Type.compare("INI_KEYNAME") == 0 && isNumber(Token_Map[i].Value) == true) {
-				Province ProvSetup;
-				ProvSetup.uID = stoi(Token_Map[i].Value);
-				//cout << "Reading: " << ProvSetup.uID << endl;
-				//cout << "OPEN: " <<  uOpenBracket << endl;
-				//cout << "END: "<< uEndBracket << endl;
-				/* Begin Looping Within Province  */
-				for(int z = i + 1; z < Token_Map.size(); z++) {
-					if(Token_Map[z].Type.compare("INI_OPENBRACKET") == 0) { uOpenBracket++; }
-					if(Token_Map[z].Type.compare("INI_ENDBRACKET") == 0) { uEndBracket++; }
+				//cout << "I is : " << i << endl;
+				//Province ProvSetup;
+				//ProvSetup.uID = stoi(Token_Map[i].Value);
+				//cout << ProvSetup.uID << endl;
+				ProvPositions.push_back(i);
+			} 
+		}
+		
+		/*
+		cout << "size: " << ProvPositions.size() << endl;
+		for(int i = 0 ; i < Token_Map.size(); i++) {
+			cout << Token_Map[i].Type << " : " << Token_Map[i].Value << endl;
+		}*/
 
-					if(isKeyNamePop(Token_Map[z].Value) == true) {
-						Pop PopSetup;
-						PopSetup.szType = Token_Map[z].Value;
-						/* Begin Looping Within Pop */
-						for(z++; z < Token_Map.size(); z++) {
-							if(Token_Map[z].Type.compare("INI_OPENBRACKET") == 0) { uOpenBracket++; }
-							
-							if(Token_Map[z].Type.compare("INI_KEYNAME") == 0 && Token_Map[z+1].Type.compare("INI_KEYVALUE") == 0) {
-								if(Token_Map[z].Value.compare("culture") == 0) {
-									z++;
-									PopSetup.szCulture = Token_Map[z].Value;
-								}
-								if(Token_Map[z].Value.compare("religion") == 0) {
-									z++;
-									PopSetup.szReligion = Token_Map[z].Value;
-								}
-								if(Token_Map[z].Value.compare("size") == 0) {
-									//cout << Token_Map[i].Value << endl;
-									z++;
-									//cout << "Testing! : " << Token_Map[i].Type << " : " << Token_Map[i].Value << endl;
-									PopSetup.uSize = stoi(Token_Map[z].Value);
-								}
-								if(Token_Map[z].Value.compare("militancy") == 0) {
-									z++;
-									PopSetup.fMilitancy = stof(Token_Map[z].Value);
-								}
-								if(Token_Map[z].Value.compare("rebel_type") == 0) {
-									z++;
-									PopSetup.szRebelType = Token_Map[z].Value;
-								}
-								//if(uOpenBracket == uEndBracket) {uEndBracket = 0; uOpenBracket = 0;  ProvSetup.Populations.push_back(PopSetup); cout << "PopBreaking...\n";  break; }
-								if(Token_Map[z].Type.compare("INI_ENDBRACKET") == 0) { 
-									uEndBracket++; 
-									ProvSetup.Populations.push_back(PopSetup);
-									//cout << "Pop Breaking...\n";
-									break;
-								}
+		for(int i = 0; i < ProvPositions.size(); i++) {
+			// ProvPositions incl. the location of each location of the provinces.
+			Province ProvSetup;
+			Pop PopSetup;
+	
+			//cout << "FFSFS Prov is... " << ProvPositions[i] << endl;
+			uint uZ = ProvPositions[i];
+			//cout << "uZ is ... " << uZ << endl;
+			ProvSetup.uID = stoi(Token_Map[uZ].Value);
+
+
+			// Start reading the pops of the Province 
+			for(int z = (1 + uZ);z < Token_Map.size(); z++) {
+				if(Token_Map[z].Type.compare("INI_OPENBRACKET") == 0) { uOpenBracket++; }
+				if(Token_Map[z].Type.compare("INI_ENDBRACKET") == 0) { uEndBracket++; }
+				
+				if(isKeyNamePop(Token_Map[z].Value) == true) {
+					PopSetup.szType = Token_Map[z].Value;
+					cout << PopSetup.szType << endl;
+					// Start reading one of the Pops
+					for(z++;;z++) {
+						if(Token_Map[z].Type.compare("INI_OPENBRACKET") == 0) { uOpenBracket++; }
+						if(Token_Map[z].Type.compare("INI_ENDBRACKET") == 0) { 
+							uEndBracket++; 
+							cout << "Pushing POP...\n";
+							ProvSetup.Populations.push_back(PopSetup);
+							break; 
+						}
+						//cout << Token_Map[z].Value << endl;
+
+						if(Token_Map[z].Type.compare("INI_KEYNAME") == 0) {
+							if(Token_Map[z].Value.compare("culture") == 0) {
+								z++;
+								PopSetup.szCulture = Token_Map[z].Value;
+								cout << PopSetup.szCulture << endl;
+							}
+							if(Token_Map[z].Value.compare("religion") == 0) {
+								z++;
+								PopSetup.szReligion = Token_Map[z].Value;
+								cout << PopSetup.szReligion << endl;
+							}
+							if(Token_Map[z].Value.compare("size") == 0) {
+								z++;
+								PopSetup.uSize = stoi(Token_Map[z].Value);
+								cout << PopSetup.uSize << endl;
 							}
 						}
-					} else {
-						//cout << Token_Map[i].Value << endl;
 					}
-					if(uOpenBracket == uEndBracket) {
+					cout << endl;
+					if(Token_Map[z+1].Type.compare("INI_ENDBRACKET") == 0) {
+						cout << "Pushing Province...\n";
+						ProvWPop.push_back(ProvSetup);
 						uEndBracket = 0;
 						uOpenBracket = 0;
-						ProvWPop.push_back(ProvSetup); 
-						cout << "ProvBreaking...\n";  
-						break; 
+						break;
 					} else {
-						uEndBracket = 0;
-						uOpenBracket = 0;
+						//cout << "Debug: " << uEndBracket << " : " << uOpenBracket << endl;
+						//cout << "Debug: " << Token_Map[z].Value << endl;
+						//cout << Token_Map[z+1].Type << " : " << Token_Map[z+1].Value << endl;
 					}
 				}
-			} 
-			if(uOpenBracket == uEndBracket && Token_Map.size() == i) { 
-				uEndBracket = 0;
-				uOpenBracket = 0;
-				cout << "Token Map Finished...\n";
-				break; 
 			}
+
+
 		}
 		
 	}
@@ -376,75 +368,30 @@ vector<Province> populateProvinceWPops() {
 
 
 
-/*vector<Province> populateProvinceWAttrib(char* Folder) {
-	vector<string> Listing = listingOfFolder(Folder);
-	KeyResult Key;
-	string szFile = Folder;
-	vector<Province> List;
+/*vector<Province> populateProvinceWAttrib(vector<Province> ProvFS, char* File) {
+	vector<Province> ProvWAtt = ProvFS;
+	
 
-
-
-	for(uint uFLInt = 0; uFLInt < Listing.size(); uFLInt++) {
-		uint uEndBracket = 0;
-		uint uOpenBracket = 0;
-
-		Province ProvSetup;
-
-		vector<Token> Token_Map = readIniFile(Listing[uFLInt]);
-		Key = seperateKey(Listing[uFLInt], '-');
-		
-		Key.szKeyName.erase(0, szFile.size());
-		ProvSetup.uID = stoi(Key.szKeyName);
-		Key = seperateKey(Key.szKeyValue, '.');
-		ProvSetup.szName = Key.szKeyName;
-		
-		
-		 Begin Looping through TokenMap  
-		for(int i = 0; i < Token_Map.size(); i++) {
-			if(Token_Map[i].Type.compare("INI_KEYNAME") == 0) {
-				if(Token_Map[i].Value.compare("owner") == 0) {
-					ProvSetup.szOwner = Token_Map[i+1].Value;
-				}
-				if(Token_Map[i].Value.compare("controller") == 0) {
-					ProvSetup.szController = Token_Map[i+1].Value;
-				}
-				if(Token_Map[i].Value.compare("add_core") == 0) {
-					ProvSetup.Cores.push_back(Token_Map[i+1].Value);
-				}
-				if(Token_Map[i].Value.compare("trade_goods") == 0) {
-					ProvSetup.szGood = Token_Map[i+1].Value;
-				}
-				if(Token_Map[i].Value.compare("life_rating") == 0) {
-					ProvSetup.uLiferating = stoi(Token_Map[i+1].Value);
-				}
-				if(Token_Map[i].Value.compare("state_building") == 0) {
-					cout << "Found State Building! Breaking...\n";
-					break;
-				}
-			}
-			
-			//if(Token_Map[i].Type.compare("INI_OPENBRACKET") == 0) { uOpenBracket++; }
-			//if(Token_Map[i].Type.compare("INI_ENDBRACKET") == 0) { uEndBracket++; }
-			//if(uOpenBracket == uEndBracket) { break; }
+	for(int i = 0; i < ProvWAtt.size(); i++) {
+		for(int x = 0; x < ProvWAtt[i].Populations.size(); x++) {
+			cout << ProvWAtt[i].Populations[x].uSize << endl;
 		}
-		List.push_back(ProvSetup);
-		 We assign the varibles here since we dont want to have to read through the *entire* vector each time just to change a single variable...  
 	}
-	return List;
+
+
+	return ProvWAtt;
 }*/
 
 
 
-
-vector<Province> populateProvinceWAttrib(vector<Province> ProvFS, char* File) {
+vector<Province> populateProvinceWAttrib(vector<Province> ProvWPop, char* File) {
+	vector<Province> ProvFS = ProvWPop;
         KeyResult Key;
         vector<Token> Token_Map;
         vector<string> Listing = listingOfFolder(File, false);
         string szFile;
 
-        /*
-         * This code isnt expandable and will only work with the files shipped in the original Vic2, (w/o dlc)
-         */
+         /* This code isnt expandable and will only work with the files shipped in the original Vic2, (w/o dlc) */
 
 
         for(int i = 0; i < Listing.size(); i++) {
@@ -461,22 +408,22 @@ vector<Province> populateProvinceWAttrib(vector<Province> ProvFS, char* File) {
 			}
 		}
 		if(True == false) {
-			//cout << "ProvID: " << ProvID << " doesnt exist!\n";
+			cout << "ProvID: " << ProvID << " doesnt exist!\n";
+			ProvPos = 0;
 		}
 
 
 		Token_Map = readIniFile(szFile);
 		//cout << szFile << endl;
-		/*
-		for(int y = 0; y < Token_Map.size(); y++) {
-			cout << Token_Map[y].Value << endl;
-		}*/
 		//cout << "Done!\n";
 		//cout << Token_Map.size() << endl;
 		for(int z = 0; z < Token_Map.size(); z++) {
 			if(Token_Map[z].Type.compare("INI_KEYNAME") == 0) {
+				
+				
 				if(Token_Map[z].Value.compare("owner") == 0) {
-					ProvFS[ProvPos].szOwner = Token_Map[z+1].Value;
+					z++;
+					ProvFS[ProvPos].szOwner = Token_Map[z].Value;
 				} else
 				if(Token_Map[z].Value.compare("controller") == 0) {
 					ProvFS[ProvPos].szController = Token_Map[z+1].Value;
@@ -563,8 +510,9 @@ vector<Province> populateProvinceWAttrib(vector<Province> ProvFS, char* File) {
 
 				} else
 				if(Token_Map[z].Value.compare("trade_goods") == 0) {
-					ProvFS[ProvPos].szGood = "FUCKKCK";
-					//ProvFS[ProvPos].szGood = Token_Map[z+1].Value;
+					//ProvFS[ProvPos].szGood = "FUCKKCK";
+					//cout << "FUCK\n";
+					ProvFS[ProvPos].szGood = Token_Map[z+1].Value;
 				} else {
 					cout << ProvID << ": " <<  "|" << Token_Map[z].Value << " = " << Token_Map[z+1].Value << "|" << endl;
 				}

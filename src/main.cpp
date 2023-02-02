@@ -25,15 +25,20 @@ using namespace std;
 
 int main(int argc, char* argv[]) {
 	vector<Province> Welt = populateProvinceWPops();
-	for(int i = 0; i < Welt.size(); i++) {
-		cout << i << endl;
-		cout << Welt[i].uID << endl;
+
+	
+	cout << "   "<< Welt.size() << endl;
+	for(int x = 0; x < Welt.size(); x++) {
+		for(int y = 0; y < Welt[x].Populations.size(); y++) {
+			cout << Welt[x].uID << " : " << Welt[x].Populations[y].uSize << endl;
+		}
 	}
-	cout << Welt.size() << endl;
-	return 0;
-        Global_Market GM;
 	
 
+
+	return 0;
+
+	/*
 	Welt = populateProvinceWAttrib(Welt, "game/history/provinces/africa/");
 	Welt = populateProvinceWAttrib(Welt, "game/history/provinces/asia/");
 	Welt = populateProvinceWAttrib(Welt, "game/history/provinces/australia/");
@@ -57,7 +62,7 @@ int main(int argc, char* argv[]) {
 	Welt = populateProvinceWAttrib(Welt, "game/history/provinces/united kingdom");
 	Welt = populateProvinceWAttrib(Welt, "game/history/provinces/usa/");
 
-	orgIntoState(Welt);
+	//orgIntoState(Welt);
 	
 	for(int i = 0; i < Welt.size(); i++) {
 		if(Welt[i].szGood.compare("Sand") == 0) {
@@ -80,6 +85,7 @@ int main(int argc, char* argv[]) {
 		}
 	}
 	cout << "World Population: " << WorldPop << endl;
+	*/
         
 
 
