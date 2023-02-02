@@ -141,64 +141,6 @@ vector<string> readWCR(string File) {
  * instead as part of another function...       -Breizh
  */
 
-/*vector<Token> readIniFile(string File) {
-        ifstream Readfile;
-        KeyResult Key;
-        Token t_Setup;
-        vector<Token> Token_Map;
-	string szLine;
-
-	vector<string> LinesOfFile = readWCR(File);
-
-
-        //while(getline(Readfile, szLine)) {
-	for(int i = 0; i < LinesOfFile.size(); i++) {
-		szLine = LinesOfFile[i];
-                t_Setup.Type.erase(t_Setup.Type.begin(), t_Setup.Type.end());
-                t_Setup.Value.erase(t_Setup.Value.begin(), t_Setup.Value.end());
-                Key.szKeyName.erase(Key.szKeyName.begin(), Key.szKeyName.end());
-                Key.szKeyValue.erase(Key.szKeyValue.begin(), Key.szKeyValue.end());
-                szLine = stripTabs(szLine);
-                if(szLine[0] != '#') {
-                        Key = seperateKey(szLine, '=');
-                        if(Key.szKeyName[0] == '{' || Key.szKeyValue[0] == '{') {
-                                //Token_Map.insert({"INI_OPENBRACKET", "{"});
-                                //cout << "INI_OPENBRACKET: " << Key.szKeyName << endl;
-                                t_Setup.Type = "INI_OPENBRACKET";
-                                t_Setup.Value = "{";
-                                Token_Map.push_back(t_Setup);
-                        } else
-                        if(Key.szKeyValue.empty() != true) {
-                        	t_Setup.Type = "INI_KEYVALUE";
-                        	t_Setup.Value = Key.szKeyValue;
-                                Token_Map.push_back(t_Setup);
-                       } else
-                        if(Key.szKeyName[0] == '}') {
-                                //Token_Map.insert({"INI_ENDBRACKET","}"});
-                                //cout << "INI_END_BRACKET: " << Key.szKeyName << endl;
-                                t_Setup.Type = "INI_ENDBRACKET";
-                                t_Setup.Value = "}";
-                                Token_Map.push_back(t_Setup);
-                        } 
-                        if(Key.szKeyName.empty() != true && Key.szKeyValue[0] != '}') {
-                                //Token_Map.insert({"INI_KEYNAME", Key.szKeyName});
-                                //cout << "INI_KEYNAME: " << Key.szKeyName << endl;
-                                t_Setup.Type = "INI_KEYNAME";
-                                t_Setup.Value = Key.szKeyName;
-                                Token_Map.push_back(t_Setup);
-                        }
-
-
-
-                }
-        }
-
-
-
-
-        return Token_Map;
-}*/
-
 vector<Token> readIniFile(string File) {
 	ifstream Readfile;
 	vector<Token> Token_Map;
@@ -371,21 +313,6 @@ vector<Province> populateProvinceWPops() {
 	return ProvWPop;
 }
 
-
-
-/*vector<Province> populateProvinceWAttrib(vector<Province> ProvFS, char* File) {
-	vector<Province> ProvWAtt = ProvFS;
-	
-
-	for(int i = 0; i < ProvWAtt.size(); i++) {
-		for(int x = 0; x < ProvWAtt[i].Populations.size(); x++) {
-			cout << ProvWAtt[i].Populations[x].uSize << endl;
-		}
-	}
-
-
-	return ProvWAtt;
-}*/
 
 
 // Some province files (136, 1107, 232, 123, 211, 219, 200, and 116) do not work due to '\r' line terminators...
