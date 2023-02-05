@@ -34,7 +34,7 @@ bool isNumber(string szLine);
 
 vector<Token> readIniFile(string File);
 
-void populateProvinceWPops(vector<Province> *ProvWPop);
+vector<Province> populateProvinceWPops();
 
 vector<Province> populateProvinceWAttrib(vector<Province> ProvWPop, char* Folder);
 

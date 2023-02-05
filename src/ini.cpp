@@ -342,7 +342,8 @@ vector<Token> readIniFile(string File) {
 }*/
 
 // This code is being written at 0331, it probably has errors, hopefully less errors than above code.
-void populateProvinceWPops(vector<Province> *ProvWPop) {
+vector<Province> populateProvinceWPops() {
+	vector<Province> ProvWPop;
 	vector<string> Listing = listingOfFolder("game/history/pops/1836.1.1/", true);
 
 	for(uint ListPos = 0; ListPos < Listing.size(); ListPos++) {
@@ -413,14 +414,14 @@ void populateProvinceWPops(vector<Province> *ProvWPop) {
 						break; 
 					}
 				}
-				ProvWPop->push_back(ProvSetup); 
+				ProvWPop.push_back(ProvSetup); 
 				uEndBracket = 0;
 				uOpenBracket = 0;
 			}
 		}
 	}
 
-	return;
+	return ProvWPop;
 }
 
 

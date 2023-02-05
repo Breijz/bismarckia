@@ -28,8 +28,7 @@ int main(int argc, char* argv[]) {
 	//cout << "Strike any key to continue ^-^" << '\n';
 	//cin.get();
 	vector<Province> Welt;
-	populateProvinceWPops(&Welt);
-	cout << "Fuck\n";
+	Welt = populateProvinceWPops();
 
 	cout << "Information read through populateProvinceWPops()\n";
 	cout << "Strike any key to continue\n";
