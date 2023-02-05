@@ -27,18 +27,22 @@ int main(int argc, char* argv[]) {
 	//cout << "This contains examples/displays of all the data we have collected through functions" << '\n';
 	//cout << "Strike any key to continue ^-^" << '\n';
 	//cin.get();
-	vector<Province> Welt = populateProvinceWPops();
+	vector<Province> Welt;
+	populateProvinceWPops(&Welt);
+	cout << "Fuck\n";
 
-	//cout << "Information read through populateProvinceWPops()\n";
-	//cout << "Strike any key to continue\n";
-	//cin.get();
+	cout << "Information read through populateProvinceWPops()\n";
+	cout << "Strike any key to continue\n";
+	cin.get();
+
 	for(uint y = 0; y < Welt.size(); y++) {
 		cout << Welt[y].uID << ":\n";
 		for(uint x = 0; x < Welt[y].Populations.size(); x++) {
-			cout << "\t" << Welt[x].Populations[y].szType << "\n";
-			cout << "\t" << Welt[x].Populations[y].szCulture << "\n";
-			cout << "\t" << Welt[x].Populations[y].szReligion << "\n";
-			cout << "\t" << Welt[x].Populations[y].uSize << "\n";
+			//cout << "\t szType Size: " << Welt[y].Populations[x].szType.length() << "\n";
+			cout << "\t szType: " << Welt[y].Populations[x].szType << "\n";
+			cout << "\t szCulture: " << Welt[y].Populations[x].szCulture << "\n";
+			cout << "\t szReligion: " << Welt[y].Populations[x].szReligion << "\n";
+			cout << "\t uSize: " << Welt[y].Populations[x].uSize << "\n";
 		}
 	}
 	

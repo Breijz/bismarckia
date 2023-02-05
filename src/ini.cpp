@@ -30,7 +30,7 @@ using namespace std;
 string stripTabs(string szLine) {
     string Ans;
     for(int i = 0; i < szLine.size(); i++) {
-        if(szLine[i] != '\t' && szLine[i] != ' ' && szLine[i] != '\r' && szLine[i] != '\n') {
+        if(szLine[i] != '\t' && szLine[i] != ' ' && szLine[i] != '\r') {
             Ans.push_back(szLine[i]);
         }
     }
@@ -245,9 +245,9 @@ vector<Token> readIniFile(string File) {
 
 
 
-vector<Province> populateProvinceWPops() {
+/*void populateProvinceWPops(vector<Province> *ProvWPop) {
 	vector<string> Listing = listingOfFolder("game/history/pops/1836.1.1/", true);
-	vector<Province> ProvWPop;
+	//vector<Province> ProvWPop;
 
 
 	for(uint uFLInt = 0; uFLInt < Listing.size(); uFLInt++) {
@@ -264,16 +264,14 @@ vector<Province> populateProvinceWPops() {
 		}
 		
 
+		//Use the Province Positions inside of Token Map
 		for(int i = 0; i < ProvPositions.size(); i++) {
-			// ProvPositions incl. the location of each location of the provinces.
 			Province ProvSetup;
-			Pop PopSetup;
+			// ProvPositions incl. the location of each location of the provinces in the Token Map
 	
-			//cout << "FFSFS Prov is... " << ProvPositions[i] << endl;
 			uint uZ = ProvPositions[i];
-			//cout << "uZ is ... " << uZ << endl;
 			ProvSetup.uID = stoi(Token_Map[uZ].Value);
-			//cout << "Province ID: " << ProvSetup.uID << endl;
+			cout << "ID: " << ProvSetup.uID << endl;
 
 
 			// Start reading the pops of the Province 
@@ -282,8 +280,10 @@ vector<Province> populateProvinceWPops() {
 				if(Token_Map[z].Type.compare("INI_ENDBRACKET") == 0) { uEndBracket++; }
 				
 				if(isKeyNamePop(Token_Map[z].Value) == true) {
+					Pop PopSetup;
+					PopSetup.szType.resize(Token_Map[z].Value.size());
 					PopSetup.szType = Token_Map[z].Value;
-					//cout << "|" << PopSetup.szType << "|" << endl;
+					//cout << "\t" << PopSetup.szType << endl;
 					// Start reading one of the Pops
 					for(z++;;z++) {
 						if(Token_Map[z].Type.compare("INI_OPENBRACKET") == 0) { uOpenBracket++; }
@@ -299,21 +299,22 @@ vector<Province> populateProvinceWPops() {
 							if(Token_Map[z].Value.compare("culture") == 0) {
 								z++;
 								PopSetup.szCulture = Token_Map[z].Value;
-								//cout << "|" << PopSetup.szCulture << "|" << endl;
-							}
+								//cout << "Culture Token Map Size: " << Token_Map[z].Value.size() << endl;
+							} else
 							if(Token_Map[z].Value.compare("religion") == 0) {
 								z++;
 								PopSetup.szReligion = Token_Map[z].Value;
-								//cout << "|" << PopSetup.szReligion << "|" << endl;
-							}
+							} else
 							if(Token_Map[z].Value.compare("size") == 0) {
 								z++;
 								PopSetup.uSize = stoi(Token_Map[z].Value);
-								//cout << PopSetup.uSize << endl;
 							}
 						}
 					}
 					ProvSetup.Populations.push_back(PopSetup);
+					PopSetup.szCulture.erase(0, string::npos);
+					PopSetup.szReligion.erase(0, string::npos);
+					PopSetup.uSize = 0;
 					if(Token_Map[z+1].Type.compare("INI_ENDBRACKET") == 0) {
 						//cout << "Pushing Province...\n";
 						//ProvWPop.push_back(ProvSetup);
@@ -329,7 +330,7 @@ vector<Province> populateProvinceWPops() {
 			}
 			// This is stupid, but required as otherwise Provinces 77 and 265 dont get pushed into ProvWPop
 			// Why these? not sure, and it shall remain a mystery i suppose
-			ProvWPop.push_back(ProvSetup);
+			ProvWPop->push_back(ProvSetup);
 			uEndBracket = 0;
 			uOpenBracket = 0;
 
@@ -337,7 +338,89 @@ vector<Province> populateProvinceWPops() {
 		}
 		
 	}
-	return ProvWPop;
+	return;
+}*/
+
+// This code is being written at 0331, it probably has errors, hopefully less errors than above code.
+void populateProvinceWPops(vector<Province> *ProvWPop) {
+	vector<string> Listing = listingOfFolder("game/history/pops/1836.1.1/", true);
+
+	for(uint ListPos = 0; ListPos < Listing.size(); ListPos++) {
+		uint uEndBracket = 0;
+		uint uOpenBracket = 0;
+		vector<Token> Token_Map = readIniFile(Listing[ListPos]);
+		//Start Reading through Token_Map
+		for(uint TokPos = 0; TokPos < Token_Map.size(); TokPos++) {
+			if(isNumber(Token_Map[TokPos].Value) == true) {
+				Province ProvSetup;
+				ProvSetup.uID = stoi(Token_Map[TokPos].Value);
+				//cout << "ProvID: " << ProvSetup.uID << endl;
+				//Start Reading through a province
+				//cout << "Note: " << Token_Map[TokPos+1].Value << endl;
+				TokPos = TokPos + 1;
+				for(;TokPos < Token_Map.size(); TokPos++) {
+					if(Token_Map[TokPos].Type.compare("INI_OPENBRACKET") == 0) { uOpenBracket++; }
+					if(Token_Map[TokPos].Type.compare("INI_ENDBRACKET") == 0) { uEndBracket++; }
+					//cout << uOpenBracket << " : " << uEndBracket << endl;
+
+					if(isKeyNamePop(Token_Map[TokPos].Value) == true) {
+						Pop PopSetup;
+						PopSetup.szType = Token_Map[TokPos].Value;
+						//Begin reading through Pop
+						//cout << "Before: " << Token_Map[TokPos+1].Value << endl;
+						TokPos = TokPos + 1;
+						for(;TokPos < Token_Map.size();TokPos++) {
+							if(Token_Map[TokPos].Type.compare("INI_OPENBRACKET") == 0) { uOpenBracket++; }
+							if(Token_Map[TokPos].Type.compare("INI_ENDBRACKET") == 0) { 
+								//printf("Pushing Pop...\n"); 
+								uEndBracket++; 
+								break; 
+							}
+							//cout << "INNER: " << uOpenBracket << " : " << uEndBracket << endl;
+
+							if(Token_Map[TokPos].Type.compare("INI_KEYNAME") == 0) {
+								if(Token_Map[TokPos].Value.compare("culture") == 0) {
+									TokPos++;
+									PopSetup.szCulture.swap(Token_Map[TokPos].Value);
+									//PopSetup.szCulture = Token_Map[TokPos].Value;
+								} else
+								if(Token_Map[TokPos].Value.compare("religion") == 0) {
+									TokPos++;
+									PopSetup.szReligion.swap(Token_Map[TokPos].Value);
+									//PopSetup.szReligion = Token_Map[TokPos].Value;
+								} else
+								if(Token_Map[TokPos].Value.compare("size") == 0) {
+									TokPos++;
+									PopSetup.uSize = stoi(Token_Map[TokPos].Value);
+								} else
+								if(Token_Map[TokPos].Value.compare("militancy") == 0) {
+									TokPos++;
+									PopSetup.fMilitancy = stof(Token_Map[TokPos].Value);
+								} else
+								if(Token_Map[TokPos].Value.compare("rebel_type") == 0) {
+									TokPos++;
+									PopSetup.szRebelType = Token_Map[TokPos].Value;
+								}
+								else {
+									cout << "UNKNOWN! " << Token_Map[TokPos].Value << endl;
+								}
+							}
+						}
+						ProvSetup.Populations.push_back(PopSetup); 
+					}
+					if(uOpenBracket == uEndBracket) { 
+						//printf("Pushing Prov...\n"); 
+						break; 
+					}
+				}
+				ProvWPop->push_back(ProvSetup); 
+				uEndBracket = 0;
+				uOpenBracket = 0;
+			}
+		}
+	}
+
+	return;
 }
 
 

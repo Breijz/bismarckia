@@ -1,11 +1,8 @@
 CPP=g++
 
-all: server client
 
-server:
+compile:
 	${CPP} src/main.cpp\
 		src/ini.cpp\
-		src/filelisting.cpp -o bmserver -g
+		src/filelisting.cpp -o bmserver
 
-client:
-	${CPP} sp/main.cpp -lGLEW -lGL -lglfw -o bmclient
