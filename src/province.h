@@ -14,7 +14,7 @@ using namespace std;
 
 typedef struct {
 	string szType;
-			bool bController;
+	bool bController;
 } Revolt;
 
 class Province {
@@ -22,18 +22,18 @@ class Province {
         public:
         Province() {
                 uID = 0;
-		szName = "Unknown";
-                szOwner = "Unowned";
-                szController = "Unowned";
-                szGood = "Sand";
-                uLiferating = 35;
+		szName = "NULL";
+                szOwner = "NULL";
+                szController = "NULL";
+                szGood = "NULL";
+                uLiferating = 0;
                 uNavalBase = 0;
 		uFort = 0;
 		uRailroad = 0;
-		bColonial = true;
-		bColony = true;
-		bIsSlave = true;
-		szTerrain = "Plains";
+		bColonial = false;	// I dont believe these are interchangable, but i may be wrong
+		bColony = false;		// if they are interchangable, then populateProvinceWAttrib needs to be changed
+		bIsSlave = false;
+		szTerrain = "NULL";
                 //NOTE: Unused, for now :3      -Breizh
                 //szProvince = "NULL";
                 //szRegion = "NULL"; see line 77
@@ -58,6 +58,7 @@ class Province {
 		string szTerrain;
                 vector<Pop> Populations;
 		vector<Revolt> Rebellions;
+		vector<Factory> Factories;
                 //string szProvince;
                 //string szRegion; moved to State Class
                 /*

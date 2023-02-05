@@ -30,12 +30,26 @@ using namespace std;
 string stripTabs(string szLine) {
     string Ans;
     for(int i = 0; i < szLine.size(); i++) {
-        if(szLine[i] != '\t' && szLine[i] != ' ' && szLine[i] != '\r') {
+        if(szLine[i] != '\t' && szLine[i] != ' ' && szLine[i] != '\r' && szLine[i] != '\n') {
             Ans.push_back(szLine[i]);
         }
     }
     
     return Ans;
+}
+
+string stripComments(string szLine) {
+	string szAns;
+
+	for(int i = 0; i < szLine.size(); i++) {
+		if(szLine[i] == '#') {
+			break;	
+		} else {
+			szAns.push_back(szLine[i]);
+		}
+	}
+
+	return szAns;
 }
 
 
@@ -106,31 +120,22 @@ bool isNumber(string szLine) {
     return true;
 }
 
-vector<string> readWCR(string File) {
-	vector<string> Result;
-	string szLine;
-	string szFix;
-	fstream Readfile;
-	Readfile.open(File);
 
-	while(getline(Readfile, szLine)) {
-		for(int i = 0; i < szLine.size(); i++) {
-			if(szLine[i] != '\r' && szLine[i] != '\n') {
-				szFix.push_back(szLine[i]);
-			} else if(szLine[i] == '\r' && szLine[i+1] == '\n') {
-				Result.push_back(szFix);
-				szFix.erase(0, szFix.size());
-				break;
-			}
+vector<string> seperateAtCR(string szLine) {
+	vector<string> sepLines;
+	string finLine;
+	KeyResult Key;
+	size_t pos;
+
+		while((pos = szLine.find("\r")) != string::npos) {
+			sepLines.push_back(szLine.substr(0, pos));
+			szLine.erase(0, (pos + 1));
 		}
-		Result.push_back(szFix);
-		szFix.erase(0, szFix.size());
+		sepLines.push_back(szLine);
 
-	}
-	
-	
 
-	return Result;
+
+	return sepLines;
 }
 
 
@@ -144,6 +149,8 @@ vector<string> readWCR(string File) {
 vector<Token> readIniFile(string File) {
 	ifstream Readfile;
 	vector<Token> Token_Map;
+	vector<string> FileLines;
+	vector<string> t_Temp;
 
 	Readfile.open(File);
 	string szLine;
@@ -151,7 +158,36 @@ vector<Token> readIniFile(string File) {
 	KeyResult Key;
 	size_t pos;
 	
-	while(getline(Readfile, szLine)) {
+	while(getline(Readfile,szLine)) {
+		if(szLine[0] != ' ' && szLine[0] != '#') {
+			szLine = stripComments(szLine);
+			t_Temp = seperateAtCR(szLine);
+			for(uint i = 0; i < t_Temp.size(); i++) {
+				FileLines.push_back(t_Temp[i]);
+			}
+
+			/*
+			Key = seperateKey(szLine, '\r');
+			if(Key.szKeyValue[0] == '\n') {
+				FileLines.push_back(szLine);
+			} else if(Key.szKeyValue[0] != '\n' ) {
+				if(Key.szKeyName.empty() != true) {
+					//cout << "DEBUG szKeyName: " << Key.szKeyName << endl;
+					FileLines.push_back(Key.szKeyName);
+				}
+				if(Key.szKeyValue.empty() != true) {
+					//cout << "DEBUG szKeyValue: " << Key.szKeyValue << endl;
+					FileLines.push_back(Key.szKeyValue);
+				}
+			}
+			*/
+		}
+	}
+	Readfile.close();
+	
+	//while(getline(Readfile, szLine)) {
+	for(uint uFR = 0; uFR < FileLines.size(); uFR++) {
+		szLine = FileLines[uFR];
 		szLine = stripTabs(szLine);
 		if(szLine.empty() == false && szLine[0] != '#') {
 			//From https://stackoverflow.com/questions/14265581/parse-split-a-string-in-c-using-string-delimiter-standard-c
@@ -199,7 +235,6 @@ vector<Token> readIniFile(string File) {
 			Key.szKeyValue.erase(0, string::npos);
 		} 
 	}
-	Readfile.close();
 	return Token_Map;
 }
 
@@ -216,7 +251,7 @@ vector<Province> populateProvinceWPops() {
 
 
 	for(uint uFLInt = 0; uFLInt < Listing.size(); uFLInt++) {
-		cout << Listing[uFLInt] << endl;
+		//cout << Listing[uFLInt] << endl;
 		uint uEndBracket = 0;
 		uint uOpenBracket = 0;
 		vector<Token> Token_Map = readIniFile(Listing[uFLInt]);
@@ -224,19 +259,10 @@ vector<Province> populateProvinceWPops() {
 		// Begin Looping through TokenMap 
 		for(int i = 0; i < Token_Map.size(); i++) {
 			if(Token_Map[i].Type.compare("INI_KEYNAME") == 0 && isNumber(Token_Map[i].Value) == true) {
-				//cout << "I is : " << i << endl;
-				//Province ProvSetup;
-				//ProvSetup.uID = stoi(Token_Map[i].Value);
-				//cout << ProvSetup.uID << endl;
 				ProvPositions.push_back(i);
 			} 
 		}
 		
-		/*
-		cout << "size: " << ProvPositions.size() << endl;
-		for(int i = 0 ; i < Token_Map.size(); i++) {
-			cout << Token_Map[i].Type << " : " << Token_Map[i].Value << endl;
-		}*/
 
 		for(int i = 0; i < ProvPositions.size(); i++) {
 			// ProvPositions incl. the location of each location of the provinces.
@@ -247,7 +273,7 @@ vector<Province> populateProvinceWPops() {
 			uint uZ = ProvPositions[i];
 			//cout << "uZ is ... " << uZ << endl;
 			ProvSetup.uID = stoi(Token_Map[uZ].Value);
-			cout << "Province ID: " << ProvSetup.uID << endl;
+			//cout << "Province ID: " << ProvSetup.uID << endl;
 
 
 			// Start reading the pops of the Province 
@@ -257,14 +283,14 @@ vector<Province> populateProvinceWPops() {
 				
 				if(isKeyNamePop(Token_Map[z].Value) == true) {
 					PopSetup.szType = Token_Map[z].Value;
-					//cout << PopSetup.szType << endl;
+					//cout << "|" << PopSetup.szType << "|" << endl;
 					// Start reading one of the Pops
 					for(z++;;z++) {
 						if(Token_Map[z].Type.compare("INI_OPENBRACKET") == 0) { uOpenBracket++; }
 						if(Token_Map[z].Type.compare("INI_ENDBRACKET") == 0) { 
 							uEndBracket++; 
 							//cout << "Pushing POP...\n";
-							ProvSetup.Populations.push_back(PopSetup);
+							//ProvSetup.Populations.push_back(PopSetup);
 							break; 
 						}
 						//cout << Token_Map[z].Value << endl;
@@ -273,12 +299,12 @@ vector<Province> populateProvinceWPops() {
 							if(Token_Map[z].Value.compare("culture") == 0) {
 								z++;
 								PopSetup.szCulture = Token_Map[z].Value;
-								//cout << PopSetup.szCulture << endl;
+								//cout << "|" << PopSetup.szCulture << "|" << endl;
 							}
 							if(Token_Map[z].Value.compare("religion") == 0) {
 								z++;
 								PopSetup.szReligion = Token_Map[z].Value;
-								//cout << PopSetup.szReligion << endl;
+								//cout << "|" << PopSetup.szReligion << "|" << endl;
 							}
 							if(Token_Map[z].Value.compare("size") == 0) {
 								z++;
@@ -287,8 +313,9 @@ vector<Province> populateProvinceWPops() {
 							}
 						}
 					}
+					ProvSetup.Populations.push_back(PopSetup);
 					if(Token_Map[z+1].Type.compare("INI_ENDBRACKET") == 0) {
-						cout << "Pushing Province...\n";
+						//cout << "Pushing Province...\n";
 						//ProvWPop.push_back(ProvSetup);
 						//uEndBracket = 0;
 						//uOpenBracket = 0;
@@ -329,10 +356,12 @@ vector<Province> populateProvinceWAttrib(vector<Province> ProvWPop, char* File) 
          /* This code isnt expandable and will only work with the files shipped in the original Vic2, (w/o dlc) */
 
 
-        for(int i = 0; i < Listing.size(); i++) {
+        for(uint i = 0; i < Listing.size(); i++) {
                 szFile = File + Listing[i];
                 Key = seperateKey(Listing[i], '-');
-                uint ProvID = stoi(Key.szKeyName);
+		string t_szProv = Key.szKeyName.substr((Key.szKeyName.find_last_of("/") + 1), Key.szKeyName.length());
+		//cout << "Debug: " << t_szProv << endl;
+                uint ProvID = stoi(t_szProv);
 
 		bool True = false;
 		uint ProvPos = 0;
@@ -348,108 +377,137 @@ vector<Province> populateProvinceWAttrib(vector<Province> ProvWPop, char* File) 
 		}
 
 
+		//cout << "File: " << szFile << endl;
 		Token_Map = readIniFile(szFile);
 		//cout << szFile << endl;
 		//cout << "Done!\n";
 		//cout << Token_Map.size() << endl;
-		for(int z = 0; z < Token_Map.size(); z++) {
+		for(uint z = 0; z < Token_Map.size(); z++) {
 			if(Token_Map[z].Type.compare("INI_KEYNAME") == 0) {
-				
-				
+				if(Token_Map[z].Value.compare("trade_goods") == 0) {
+					z++;
+					ProvFS[ProvPos].szGood = Token_Map[z].Value;
+					//cout << PopSetup.szCulture << endl;
+				} else
+				if(Token_Map[z].Value.compare("life_rating") == 0) {
+					z++;
+					ProvFS[ProvPos].uLiferating = stoi(Token_Map[z].Value);
+					//cout << PopSetup.szReligion << endl;
+				} else
 				if(Token_Map[z].Value.compare("owner") == 0) {
 					z++;
 					ProvFS[ProvPos].szOwner = Token_Map[z].Value;
-				} else
-				if(Token_Map[z].Value.compare("controller") == 0) {
-					ProvFS[ProvPos].szController = Token_Map[z+1].Value;
+					//cout << PopSetup.uSize << endl;
 				} else
 				if(Token_Map[z].Value.compare("add_core") == 0) {
-					ProvFS[ProvPos].Cores.push_back(Token_Map[z+1].Value);
+					z++;
+					ProvFS[ProvPos].Cores.push_back(Token_Map[z].Value);
 				} else
-				if(Token_Map[z].Value.compare("life_rating") == 0) {
-					ProvFS[ProvPos].uLiferating = stoi(Token_Map[z+1].Value);
-				} else
-				if(Token_Map[z].Value.compare("colonial") == 0) {
-					if(Token_Map[z+1].Value.compare("yes") == 0) {
-						ProvFS[ProvPos].bColonial = true;
-					} else {
-						ProvFS[ProvPos].bColonial = false;
-					}
-				} else
-				if(Token_Map[z].Value.compare("terrain") == 0) {
-					ProvFS[ProvPos].szTerrain = Token_Map[z+1].Value;
-				} else
-				if(Token_Map[z].Value.compare("naval_base") == 0) {
-					ProvFS[ProvPos].uNavalBase = stoi(Token_Map[z+1].Value);
-				} else
-				if(Token_Map[z].Value.compare("fort") == 0) {
-					ProvFS[ProvPos].uFort = stoi(Token_Map[z+1].Value);
-				} else
-				if(Token_Map[z].Value.compare("railroad") == 0) {
-					ProvFS[ProvPos].uRailroad = stoi(Token_Map[z+1].Value);
-				} else
-				if(Token_Map[z].Value.compare("state_building") == 0) {
-					Factory FactSetup;
-					for(z++; z < Token_Map.size(); z++) {
-						if(Token_Map[z].Type.compare("INI_ENDBRACKET") == 0) { break; }
-						
-						if(Token_Map[z].Value.compare("level") == 0) {
-							FactSetup.uLevel = stoi(Token_Map[z+1].Value);
-						}
-						if(Token_Map[z].Value.compare("building") == 0) {
-							FactSetup.szBuilding= Token_Map[z+1].Value;
-						}
-						if(Token_Map[z].Value.compare("upgrade") == 0) {
-							if(Token_Map[z+1].Value.compare("yes") == 0) {
-								FactSetup.bUpgrade = true;
-							} else {
-								FactSetup.bUpgrade = false;	
-							}
-						}
-
-					}
-					//ProvFS[ProvPos].Factories.push_back(FactSetup);
-
+				if(Token_Map[z].Value.compare("controller") == 0) {
+					z++;
+					ProvFS[ProvPos].szController = Token_Map[z].Value;
 				} else
 				if(Token_Map[z].Value.compare("colony") == 0) {
-					if(Token_Map[z+1].Value.compare("yes") == 0) {
+					z++;
+					if(Token_Map[z].Value.compare("yes") == 0) {
 						ProvFS[ProvPos].bColony = true;
 					} else {
 						ProvFS[ProvPos].bColony = false;
 					}
 				} else
 				if(Token_Map[z].Value.compare("is_slave") == 0) {
-					if(Token_Map[z+1].Value.compare("yes") == 0) {
+					z++;
+					if(Token_Map[z].Value.compare("yes") == 0) {
 						ProvFS[ProvPos].bIsSlave = true;
 					} else {
 						ProvFS[ProvPos].bIsSlave = false;
 					}
+					
 				} else
-				if(Token_Map[z].Value.compare("revolt") == 0) {
-					Revolt RevSetup;
-					for(z++; z < Token_Map.size(); z++) {
-						if(Token_Map[z].Type.compare("INI_ENDBRACKET") == 0) { break; }
-						
-						if(Token_Map[z].Value.compare("type") == 0) {
-							RevSetup.szType = Token_Map[z+1].Value;
-						}
-						if(Token_Map[z].Value.compare("controller") == 0) {
-							if(Token_Map[z+1].Value.compare("yes") == 0) {
-								RevSetup.bController = true;
-							} else {
-								RevSetup.bController = false;
+				if(Token_Map[z].Value.compare("fort") == 0) {
+					z++;
+					ProvFS[ProvPos].uFort = stoi(Token_Map[z].Value);
+				} else
+				if(Token_Map[z].Value.compare("railroad") == 0) {
+					z++;
+					ProvFS[ProvPos].uRailroad = stoi(Token_Map[z].Value);
+				} else
+				if(Token_Map[z].Value.compare("naval_base") == 0) {
+					z++;
+					ProvFS[ProvPos].uNavalBase = stoi(Token_Map[z].Value);
+				} else
+				if(Token_Map[z].Value.compare("colonial") == 0) {
+					z++;
+					if(Token_Map[z].Value.compare("yes") == 0) {
+						ProvFS[ProvPos].bColonial = true;
+					} else {
+						ProvFS[ProvPos].bColonial = false;
+					}
+				} else
+				if(Token_Map[z].Value.compare("terrain") == 0) {
+					z++;
+					ProvFS[ProvPos].szTerrain = Token_Map[z].Value;
+				} else
+				if(Token_Map[z].Value.compare("state_building") == 0) {
+					Factory FactSetup;
+					for(;z < Token_Map.size(); z++) {
+						if(Token_Map[z].Type.compare("INI_ENDBRACKET") == 0) {
+							break;
+						} 
+						if(Token_Map[z].Type.compare("INI_KEYNAME") == 0) {
+							if(Token_Map[z].Value.compare("level") == 0) {
+								z++;
+								FactSetup.uLevel = stoi(Token_Map[z].Value);
+							} else
+							if(Token_Map[z].Value.compare("building") == 0) {
+								z++;
+								FactSetup.szBuilding = Token_Map[z].Value;
+							} else
+							if(Token_Map[z].Value.compare("upgrade") == 0) {
+								z++;
+								if(Token_Map[z].Value.compare("yes") == 0) {
+									FactSetup.bUpgrade = true;
+								} else {
+									FactSetup.bUpgrade = false;
+								}
+							}
+							else {
+								// TODO: This code (may) not be fully functional, here
+								// when cout debug is on itll report "state_building"
+								//cout << "Error! " << Token_Map[z].Value << " : " << Token_Map[z+1].Value << endl;
 							}
 						}
 					}
-					ProvFS[ProvPos].Rebellions.push_back(RevSetup);
-
+					ProvFS[ProvPos].Factories.push_back(FactSetup);
 				} else
-				if(Token_Map[z].Value.compare("trade_goods") == 0) {
-					//ProvFS[ProvPos].szGood = "FUCKKCK";
-					//cout << "FUCK\n";
-					ProvFS[ProvPos].szGood = Token_Map[z+1].Value;
-				} else {
-					cout << ProvID << ": " <<  "|" << Token_Map[z].Value << " = " << Token_Map[z+1].Value << "|" << endl;
+				if(Token_Map[z].Value.compare("revolt") == 0) {
+					Revolt RevSetup;
+					for(;z < Token_Map.size(); z++) {
+						if(Token_Map[z].Type.compare("INI_ENDBRACKET") == 0) {
+							break;
+						}
+						if(Token_Map[z].Type.compare("INI_KEYNAME") == 0) {
+							if(Token_Map[z].Value.compare("type") == 0) {
+								z++;
+								RevSetup.szType = Token_Map[z].Value;
+							} else
+							if(Token_Map[z].Value.compare("controller") == 0) {
+								z++;
+								if(Token_Map[z].Value.compare("yes") == 0) {
+									RevSetup.bController = true;
+								} else {
+									RevSetup.bController = false;
+								}
+							}
+						} else {
+							// TODO: This has the same issue as state_building
+							//cout << "Error! " << Token_Map[z].Value << " : " << Token_Map[z+1].Value << endl;
+						}
+					}
+					ProvFS[ProvPos].Rebellions.push_back(RevSetup);
+				}
+				else {
+					cout << "Error in " << ProvFS[ProvPos].uID << " : " << Token_Map[z].Value << " : " << Token_Map[z+1].Value << endl;
 				}
 			}
 		}

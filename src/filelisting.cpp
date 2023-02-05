@@ -1,6 +1,7 @@
 #include "filelisting.h"
 
 #include <iostream>
+#include <filesystem>
 #include <dirent.h>
 #include <sys/types.h>
 
@@ -32,7 +33,7 @@ vector<string> listingOfFolder(char* Directory, bool keepFilePath) {
         }
     }
 
-    /* Fixes the Listing */
+    // Fixes the Listing 
     if(keepFilePath == true) {
     	for(int i = 0; i < Listing.size(); i++) {
 		Listing[i] = Directory + Listing[i];
