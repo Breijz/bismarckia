@@ -1,7 +1,6 @@
 Bismarckia
 ==========  
   
-Bismarckia is a attempt to create a open source vic2 recreation, mainly server and shared files.  
 
 File Structure
 --------------
