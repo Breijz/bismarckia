@@ -1,14 +1,8 @@
 #include <iostream>
 #include <thread>
 
-#include "state.h"
 #include "province.h"
 #include "pop.h"
-#include "rgo.h"
-#include "common_market.h"
-#include "global_market.h"
-#include "goods.h"
-#include "country.h"
 
 // These use the better system of having a header file include a source file
 // The rest of the ones above ought to be converted at some point
@@ -17,6 +11,9 @@
 #include "filelisting.h"
 #include "factory.h"
 
+// These HPP files are permenat
+#include "market.hpp"
+
 
 
 using namespace std;
@@ -24,6 +21,12 @@ using namespace std;
 
 
 int main(int argc, char* argv[]) {
+	Market GM;
+	cout << GM.listOfGoods.size() << endl;
+	for(int i = 0; i < GM.listOfGoods.size(); i++) {
+		cout << "GM.szName = " << GM.listOfGoods[i].szName << endl;
+	}
+	return 0;
 	//cout << "This contains examples/displays of all the data we have collected through functions" << '\n';
 	//cout << "Strike any key to continue ^-^" << '\n';
 	//cin.get();

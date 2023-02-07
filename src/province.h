@@ -17,6 +17,7 @@ typedef struct {
 	bool bController;
 } Revolt;
 
+
 class Province {
 
         public:
@@ -34,6 +35,7 @@ class Province {
 		bColony = false;		// if they are interchangable, then populateProvinceWAttrib needs to be changed
 		bIsSlave = false;
 		szTerrain = "NULL";
+		szClimate = "NULL";
                 //NOTE: Unused, for now :3      -Breizh
                 //szProvince = "NULL";
                 //szRegion = "NULL"; see line 77
@@ -56,6 +58,7 @@ class Province {
 		bool bColony;
 		bool bIsSlave;
 		string szTerrain;
+		string szClimate;
                 vector<Pop> Populations;
 		vector<Revolt> Rebellions;
 		vector<Factory> Factories;

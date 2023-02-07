@@ -9,7 +9,6 @@
 #include "factory.h"
 #include "pop.h"
 #include "province.h"
-#include "state.h"
 #include "filelisting.h"
 
 
@@ -29,11 +28,15 @@ using namespace std;
 
 string stripTabs(string szLine) {
     string Ans;
-    for(int i = 0; i < szLine.size(); i++) {
-        if(szLine[i] != '\t' && szLine[i] != ' ' && szLine[i] != '\r') {
-            Ans.push_back(szLine[i]);
-        }
-    }
+	for(int i = 0; i < szLine.size(); i++) {
+	    if(szLine[i] != '\t' && szLine[i] != ' ' && szLine[i] != '\r') {
+	        Ans.push_back(szLine[i]);
+	    } else if(szLine[i] == ' ') {
+		    if(isdigit(szLine[i-1]) == true && isdigit(szLine[i+1]) == true) {
+			    Ans.push_back(',');
+		    }
+	    }
+	}
     
     return Ans;
 }
@@ -56,17 +59,29 @@ string stripComments(string szLine) {
 
 
 //Inherit from servicd/getKeyValue.cpp
-KeyResult seperateKey(string Key, char Delim) {
+KeyResult seperateKey(string Key, char Delim, bool bKeepSpace) {
     KeyResult SepKey;
     bool Side = false;
-    for(int i = 0; i < Key.size(); i++) {
-        if(Key[i] == Delim) {
-            Side = true;
-        } else if(Side == false && Key[i] != ' ' /*&& Key[i] != '\r'*/) {
-            SepKey.szKeyName.push_back(Key[i]);
-        } else if(Side == true && Key[i] != ' ' /*&& Key[i] != '\r'*/) {
-            SepKey.szKeyValue.push_back(Key[i]);
-        }
+    if(bKeepSpace == false) {
+   	 for(int i = 0; i < Key.size(); i++) {
+   	     if(Key[i] == Delim) {
+   	         Side = true;
+   	     } else if(Side == false && Key[i] != ' ' /*&& Key[i] != '\r'*/) {
+   	         SepKey.szKeyName.push_back(Key[i]);
+   	     } else if(Side == true && Key[i] != ' ' /*&& Key[i] != '\r'*/) {
+   	         SepKey.szKeyValue.push_back(Key[i]);
+   	     }
+   	 }
+    } else {
+	for(int i = 0; i < Key.size(); i++) {
+   	     if(Key[i] == Delim) {
+   	         Side = true;
+   	     } else if(Side == false /*&& Key[i] != '\r'*/) {
+   	         SepKey.szKeyName.push_back(Key[i]);
+   	     } else if(Side == true /*&& Key[i] != '\r'*/) {
+   	         SepKey.szKeyValue.push_back(Key[i]);
+   	     }
+   	 }
     }
     return SepKey;
 }
@@ -121,13 +136,13 @@ bool isNumber(string szLine) {
 }
 
 
-vector<string> seperateAtCR(string szLine) {
+vector<string> seperateAtCR(string szLine, string szDelim) {
 	vector<string> sepLines;
 	string finLine;
 	KeyResult Key;
 	size_t pos;
 
-		while((pos = szLine.find("\r")) != string::npos) {
+		while((pos = szLine.find(szDelim)) != string::npos) {
 			sepLines.push_back(szLine.substr(0, pos));
 			szLine.erase(0, (pos + 1));
 		}
@@ -146,7 +161,7 @@ vector<string> seperateAtCR(string szLine) {
  * instead as part of another function...       -Breizh
  */
 
-vector<Token> readIniFile(string File) {
+vector<Token> readIniFile(string File, bool bCheckKeyValue) {
 	ifstream Readfile;
 	vector<Token> Token_Map;
 	vector<string> FileLines;
@@ -161,7 +176,7 @@ vector<Token> readIniFile(string File) {
 	while(getline(Readfile,szLine)) {
 		if(szLine[0] != ' ' && szLine[0] != '#') {
 			szLine = stripComments(szLine);
-			t_Temp = seperateAtCR(szLine);
+			t_Temp = seperateAtCR(szLine, "\r");
 			for(uint i = 0; i < t_Temp.size(); i++) {
 				FileLines.push_back(t_Temp[i]);
 			}
@@ -212,7 +227,11 @@ vector<Token> readIniFile(string File) {
 			}*/
 
 			
-			if(Key.szKeyValue.empty() == false && Key.szKeyValue[0] != '{' && Key.szKeyValue[0] != '}') {
+			if(Key.szKeyValue.empty() == false && Key.szKeyValue[0] != '{' && Key.szKeyValue[0] != '}' && bCheckKeyValue == true) {
+				TokenSetup.Type = "INI_KEYVALUE";
+				TokenSetup.Value = Key.szKeyValue;
+				Token_Map.push_back(TokenSetup);
+			} else if(Key.szKeyValue.empty() == false && Key.szKeyValue[0] != '}' && bCheckKeyValue == false) {
 				TokenSetup.Type = "INI_KEYVALUE";
 				TokenSetup.Value = Key.szKeyValue;
 				Token_Map.push_back(TokenSetup);
@@ -349,7 +368,7 @@ vector<Province> populateProvinceWPops() {
 	for(uint ListPos = 0; ListPos < Listing.size(); ListPos++) {
 		uint uEndBracket = 0;
 		uint uOpenBracket = 0;
-		vector<Token> Token_Map = readIniFile(Listing[ListPos]);
+		vector<Token> Token_Map = readIniFile(Listing[ListPos], true);
 		//Start Reading through Token_Map
 		for(uint TokPos = 0; TokPos < Token_Map.size(); TokPos++) {
 			if(isNumber(Token_Map[TokPos].Value) == true) {
@@ -442,7 +461,7 @@ vector<Province> populateProvinceWAttrib(vector<Province> ProvWPop, char* File) 
 
         for(uint i = 0; i < Listing.size(); i++) {
                 szFile = File + Listing[i];
-                Key = seperateKey(Listing[i], '-');
+                Key = seperateKey(Listing[i], '-', false);
 		string t_szProv = Key.szKeyName.substr((Key.szKeyName.find_last_of("/") + 1), Key.szKeyName.length());
 		//cout << "Debug: " << t_szProv << endl;
                 uint ProvID = stoi(t_szProv);
@@ -462,7 +481,7 @@ vector<Province> populateProvinceWAttrib(vector<Province> ProvWPop, char* File) 
 
 
 		//cout << "File: " << szFile << endl;
-		Token_Map = readIniFile(szFile);
+		Token_Map = readIniFile(szFile, true);
 		//cout << szFile << endl;
 		//cout << "Done!\n";
 		//cout << Token_Map.size() << endl;
@@ -602,19 +621,3 @@ vector<Province> populateProvinceWAttrib(vector<Province> ProvWPop, char* File) 
 }
 
 
-vector<State> orgIntoState(vector<Province> Welt) {
-	vector<Token> Token_Map = readIniFile("game/map/region.txt");
-	vector<State> Staten;
-	for(int i = 0 ; i < Token_Map.size(); i++) {
-		cout << Token_Map[i].Type << " : " <<  Token_Map[i].Value << endl;
-	}
-	return Staten;
-}
-
-
-
-
-
-
-
- 
