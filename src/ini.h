@@ -10,7 +10,6 @@
 #include "factory.h"
 #include "pop.h"
 #include "province.h"
-#include "state.h"
 
 using namespace std;
 
@@ -26,13 +25,15 @@ typedef struct {
 
 string stripTabs(string szLine);
 
-KeyResult seperateKey(string Key, char Delim);
+KeyResult seperateKey(string Key, char Delim, bool bKeepSpace);
 
 bool isKeyNamePop(string szLine);
 
 bool isNumber(string szLine);
 
-vector<Token> readIniFile(string File);
+vector<Token> readIniFile(string File, bool bCheckKeyValue);
+
+vector<string> seperateAtCR(string szLine, string szDelim);
 
 vector<Province> populateProvinceWPops();
 

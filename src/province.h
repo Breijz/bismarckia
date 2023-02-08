@@ -17,6 +17,7 @@ typedef struct {
 	bool bController;
 } Revolt;
 
+
 class Province {
 
         public:
@@ -26,6 +27,7 @@ class Province {
                 szOwner = "NULL";
                 szController = "NULL";
                 szGood = "NULL";
+
                 uLiferating = 0;		// Liferating of the province, this is never negative or a decimal, (base game its 15-50)
                 uNavalBase = 0;			// Level of Navalbase, 0 = No Base
 		uFort = 0;			// ^^^
@@ -34,6 +36,7 @@ class Province {
 		bColony = false;		// Is the Province *just* colonised
 		bIsSlave = false;		// Is the province a slave state? in these states slaves can exist
 		szTerrain = "NULL";		// Only used for ~3 provinces, all of which are Islands.
+
         }
 
         public:
@@ -51,6 +54,7 @@ class Province {
 		bool bColony;
 		bool bIsSlave;
 		string szTerrain;
+		string szClimate;
                 vector<Pop> Populations;
 		vector<Revolt> Rebellions;
 		vector<Factory> Factories;
