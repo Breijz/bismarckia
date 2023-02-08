@@ -38,6 +38,4 @@ vector<Province> populateProvinceWPops();
 
 vector<Province> populateProvinceWAttrib(vector<Province> ProvWPop, char* Folder);
 
-vector<State> orgIntoState(vector<Province> Welt);
-
 #endif

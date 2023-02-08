@@ -16,16 +16,6 @@
 using namespace std;
 
 
-/*
- * This code is made for the files shipped with Vic2, since Vic2 was made for Windows Systems, and only Windows Systems, they use '\r\n'
- * Since we only use '\n' on *nix and OSX we check for '\r' to tell if its a newline
- * In the future we'll want to allow for both *nix/OSX ('\n') and Windows ('\r\n') types of files to work
- * as currently only the original vic2 files will work (which use the windows style)
- */
-
-
-
-
 
 string stripTabs(string szLine) {
     string Ans;
@@ -37,6 +27,8 @@ string stripTabs(string szLine) {
     
     return Ans;
 }
+
+
 
 string stripComments(string szLine) {
 	string szAns;
@@ -51,7 +43,6 @@ string stripComments(string szLine) {
 
 	return szAns;
 }
-
 
 
 
@@ -71,6 +62,9 @@ KeyResult seperateKey(string Key, char Delim) {
     return SepKey;
 }
 
+
+
+// This should probably be modified so it can allow for more pops.
 bool isKeyNamePop(string szLine) {
     if(szLine.compare("craftsmen") == 0) {
         return true;
@@ -113,12 +107,14 @@ bool isKeyNamePop(string szLine) {
 }
 
 
+
 bool isNumber(string szLine) {
     for(int i = 0; i < szLine.length(); i++) {
         if(isdigit(szLine[i]) == 0) { return false; }
     }
     return true;
 }
+
 
 
 vector<string> seperateAtCR(string szLine) {
@@ -139,13 +135,13 @@ vector<string> seperateAtCR(string szLine) {
 }
 
 
+
 /*
  * This code is *alot* more generic, its nothing more than a tokeniser
  * for the INI style files that Vic2 uses, and it should work for any
  * format of the file, this function ought not to be used on its own but
  * instead as part of another function...       -Breizh
  */
-
 vector<Token> readIniFile(string File) {
 	ifstream Readfile;
 	vector<Token> Token_Map;
@@ -165,27 +161,10 @@ vector<Token> readIniFile(string File) {
 			for(uint i = 0; i < t_Temp.size(); i++) {
 				FileLines.push_back(t_Temp[i]);
 			}
-
-			/*
-			Key = seperateKey(szLine, '\r');
-			if(Key.szKeyValue[0] == '\n') {
-				FileLines.push_back(szLine);
-			} else if(Key.szKeyValue[0] != '\n' ) {
-				if(Key.szKeyName.empty() != true) {
-					//cout << "DEBUG szKeyName: " << Key.szKeyName << endl;
-					FileLines.push_back(Key.szKeyName);
-				}
-				if(Key.szKeyValue.empty() != true) {
-					//cout << "DEBUG szKeyValue: " << Key.szKeyValue << endl;
-					FileLines.push_back(Key.szKeyValue);
-				}
-			}
-			*/
 		}
 	}
 	Readfile.close();
 	
-	//while(getline(Readfile, szLine)) {
 	for(uint uFR = 0; uFR < FileLines.size(); uFR++) {
 		szLine = FileLines[uFR];
 		szLine = stripTabs(szLine);
@@ -197,7 +176,6 @@ vector<Token> readIniFile(string File) {
 			}
 			Key.szKeyValue = szLine;
 
-			//cout << Key.szKeyName << " : " << Key.szKeyValue << endl;
 			
 			
 			
@@ -207,9 +185,7 @@ vector<Token> readIniFile(string File) {
 				TokenSetup.Type = "INI_KEYNAME";
 				TokenSetup.Value = Key.szKeyName;
 				Token_Map.push_back(TokenSetup);
-			} /*else {
-				cout << "[Error] src/ini.cpp: szKeyName Empty! " << Key.szKeyName << " : " << Key.szKeyValue << " aus " << File << endl;
-			}*/
+			} 
 
 			
 			if(Key.szKeyValue.empty() == false && Key.szKeyValue[0] != '{' && Key.szKeyValue[0] != '}') {
@@ -238,108 +214,7 @@ vector<Token> readIniFile(string File) {
 	return Token_Map;
 }
 
-/*
- * This function populates a given vector of provinces with their pops
- * from history/1836.1.1/pops
- */
 
-
-
-/*void populateProvinceWPops(vector<Province> *ProvWPop) {
-	vector<string> Listing = listingOfFolder("game/history/pops/1836.1.1/", true);
-	//vector<Province> ProvWPop;
-
-
-	for(uint uFLInt = 0; uFLInt < Listing.size(); uFLInt++) {
-		//cout << Listing[uFLInt] << endl;
-		uint uEndBracket = 0;
-		uint uOpenBracket = 0;
-		vector<Token> Token_Map = readIniFile(Listing[uFLInt]);
-		vector<int> ProvPositions;
-		// Begin Looping through TokenMap 
-		for(int i = 0; i < Token_Map.size(); i++) {
-			if(Token_Map[i].Type.compare("INI_KEYNAME") == 0 && isNumber(Token_Map[i].Value) == true) {
-				ProvPositions.push_back(i);
-			} 
-		}
-		
-
-		//Use the Province Positions inside of Token Map
-		for(int i = 0; i < ProvPositions.size(); i++) {
-			Province ProvSetup;
-			// ProvPositions incl. the location of each location of the provinces in the Token Map
-	
-			uint uZ = ProvPositions[i];
-			ProvSetup.uID = stoi(Token_Map[uZ].Value);
-			cout << "ID: " << ProvSetup.uID << endl;
-
-
-			// Start reading the pops of the Province 
-			for(int z = (1 + uZ);z < Token_Map.size(); z++) {
-				if(Token_Map[z].Type.compare("INI_OPENBRACKET") == 0) { uOpenBracket++; }
-				if(Token_Map[z].Type.compare("INI_ENDBRACKET") == 0) { uEndBracket++; }
-				
-				if(isKeyNamePop(Token_Map[z].Value) == true) {
-					Pop PopSetup;
-					PopSetup.szType.resize(Token_Map[z].Value.size());
-					PopSetup.szType = Token_Map[z].Value;
-					//cout << "\t" << PopSetup.szType << endl;
-					// Start reading one of the Pops
-					for(z++;;z++) {
-						if(Token_Map[z].Type.compare("INI_OPENBRACKET") == 0) { uOpenBracket++; }
-						if(Token_Map[z].Type.compare("INI_ENDBRACKET") == 0) { 
-							uEndBracket++; 
-							//cout << "Pushing POP...\n";
-							//ProvSetup.Populations.push_back(PopSetup);
-							break; 
-						}
-						//cout << Token_Map[z].Value << endl;
-
-						if(Token_Map[z].Type.compare("INI_KEYNAME") == 0) {
-							if(Token_Map[z].Value.compare("culture") == 0) {
-								z++;
-								PopSetup.szCulture = Token_Map[z].Value;
-								//cout << "Culture Token Map Size: " << Token_Map[z].Value.size() << endl;
-							} else
-							if(Token_Map[z].Value.compare("religion") == 0) {
-								z++;
-								PopSetup.szReligion = Token_Map[z].Value;
-							} else
-							if(Token_Map[z].Value.compare("size") == 0) {
-								z++;
-								PopSetup.uSize = stoi(Token_Map[z].Value);
-							}
-						}
-					}
-					ProvSetup.Populations.push_back(PopSetup);
-					PopSetup.szCulture.erase(0, string::npos);
-					PopSetup.szReligion.erase(0, string::npos);
-					PopSetup.uSize = 0;
-					if(Token_Map[z+1].Type.compare("INI_ENDBRACKET") == 0) {
-						//cout << "Pushing Province...\n";
-						//ProvWPop.push_back(ProvSetup);
-						//uEndBracket = 0;
-						//uOpenBracket = 0;
-						break;
-					} else {
-						//cout << "Debug: " << uEndBracket << " : " << uOpenBracket << endl;
-						//cout << "Debug: " << Token_Map[z].Value << endl;
-						//cout << Token_Map[z+1].Type << " : " << Token_Map[z+1].Value << endl;
-					}
-				}
-			}
-			// This is stupid, but required as otherwise Provinces 77 and 265 dont get pushed into ProvWPop
-			// Why these? not sure, and it shall remain a mystery i suppose
-			ProvWPop->push_back(ProvSetup);
-			uEndBracket = 0;
-			uOpenBracket = 0;
-
-
-		}
-		
-	}
-	return;
-}*/
 
 // This code is being written at 0331, it probably has errors, hopefully less errors than above code.
 vector<Province> populateProvinceWPops() {
@@ -355,20 +230,17 @@ vector<Province> populateProvinceWPops() {
 			if(isNumber(Token_Map[TokPos].Value) == true) {
 				Province ProvSetup;
 				ProvSetup.uID = stoi(Token_Map[TokPos].Value);
-				//cout << "ProvID: " << ProvSetup.uID << endl;
+
 				//Start Reading through a province
-				//cout << "Note: " << Token_Map[TokPos+1].Value << endl;
 				TokPos = TokPos + 1;
 				for(;TokPos < Token_Map.size(); TokPos++) {
 					if(Token_Map[TokPos].Type.compare("INI_OPENBRACKET") == 0) { uOpenBracket++; }
 					if(Token_Map[TokPos].Type.compare("INI_ENDBRACKET") == 0) { uEndBracket++; }
-					//cout << uOpenBracket << " : " << uEndBracket << endl;
 
 					if(isKeyNamePop(Token_Map[TokPos].Value) == true) {
 						Pop PopSetup;
 						PopSetup.szType = Token_Map[TokPos].Value;
 						//Begin reading through Pop
-						//cout << "Before: " << Token_Map[TokPos+1].Value << endl;
 						TokPos = TokPos + 1;
 						for(;TokPos < Token_Map.size();TokPos++) {
 							if(Token_Map[TokPos].Type.compare("INI_OPENBRACKET") == 0) { uOpenBracket++; }
@@ -377,18 +249,15 @@ vector<Province> populateProvinceWPops() {
 								uEndBracket++; 
 								break; 
 							}
-							//cout << "INNER: " << uOpenBracket << " : " << uEndBracket << endl;
 
 							if(Token_Map[TokPos].Type.compare("INI_KEYNAME") == 0) {
 								if(Token_Map[TokPos].Value.compare("culture") == 0) {
 									TokPos++;
 									PopSetup.szCulture.swap(Token_Map[TokPos].Value);
-									//PopSetup.szCulture = Token_Map[TokPos].Value;
 								} else
 								if(Token_Map[TokPos].Value.compare("religion") == 0) {
 									TokPos++;
 									PopSetup.szReligion.swap(Token_Map[TokPos].Value);
-									//PopSetup.szReligion = Token_Map[TokPos].Value;
 								} else
 								if(Token_Map[TokPos].Value.compare("size") == 0) {
 									TokPos++;
@@ -426,10 +295,10 @@ vector<Province> populateProvinceWPops() {
 
 
 
-// Some province files (136, 1107, 232, 123, 211, 219, 200, and 116) do not work due to '\r' line terminators...
-// Keeping '\r' in the token map causes a seg. fault, Im not quite sure how to fix this at the moment, so I wont
-// handle it for now, but it needs to be handled.
-
+/*
+ * This function takes in a vector of Provinces and adds the attributes defined in /history/province/???/ 
+ * to them, to use it populateProvWPops must be used first.
+ */
 vector<Province> populateProvinceWAttrib(vector<Province> ProvWPop, char* File) {
 	vector<Province> ProvFS = ProvWPop;
         KeyResult Key;
@@ -444,7 +313,7 @@ vector<Province> populateProvinceWAttrib(vector<Province> ProvWPop, char* File) 
                 szFile = File + Listing[i];
                 Key = seperateKey(Listing[i], '-');
 		string t_szProv = Key.szKeyName.substr((Key.szKeyName.find_last_of("/") + 1), Key.szKeyName.length());
-		//cout << "Debug: " << t_szProv << endl;
+
                 uint ProvID = stoi(t_szProv);
 
 		bool True = false;
@@ -457,31 +326,27 @@ vector<Province> populateProvinceWAttrib(vector<Province> ProvWPop, char* File) 
 		}
 		if(True == false) {
 			cout << "ProvID: " << ProvID << " doesnt exist!\n";
+			// TODO: We probably want to create the Province if it doesnt exist, as to let one use
+			// the functions in whichever order they want
 			ProvPos = 0;
 		}
 
 
-		//cout << "File: " << szFile << endl;
 		Token_Map = readIniFile(szFile);
-		//cout << szFile << endl;
-		//cout << "Done!\n";
-		//cout << Token_Map.size() << endl;
+
 		for(uint z = 0; z < Token_Map.size(); z++) {
 			if(Token_Map[z].Type.compare("INI_KEYNAME") == 0) {
 				if(Token_Map[z].Value.compare("trade_goods") == 0) {
 					z++;
 					ProvFS[ProvPos].szGood = Token_Map[z].Value;
-					//cout << PopSetup.szCulture << endl;
 				} else
 				if(Token_Map[z].Value.compare("life_rating") == 0) {
 					z++;
 					ProvFS[ProvPos].uLiferating = stoi(Token_Map[z].Value);
-					//cout << PopSetup.szReligion << endl;
 				} else
 				if(Token_Map[z].Value.compare("owner") == 0) {
 					z++;
 					ProvFS[ProvPos].szOwner = Token_Map[z].Value;
-					//cout << PopSetup.uSize << endl;
 				} else
 				if(Token_Map[z].Value.compare("add_core") == 0) {
 					z++;
@@ -600,21 +465,3 @@ vector<Province> populateProvinceWAttrib(vector<Province> ProvWPop, char* File) 
                 
         return ProvFS;
 }
-
-
-vector<State> orgIntoState(vector<Province> Welt) {
-	vector<Token> Token_Map = readIniFile("game/map/region.txt");
-	vector<State> Staten;
-	for(int i = 0 ; i < Token_Map.size(); i++) {
-		cout << Token_Map[i].Type << " : " <<  Token_Map[i].Value << endl;
-	}
-	return Staten;
-}
-
-
-
-
-
-
-
- 

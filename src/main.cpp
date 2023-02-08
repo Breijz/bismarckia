@@ -24,9 +24,9 @@ using namespace std;
 
 
 int main(int argc, char* argv[]) {
-	//cout << "This contains examples/displays of all the data we have collected through functions" << '\n';
-	//cout << "Strike any key to continue ^-^" << '\n';
-	//cin.get();
+	cout << "This contains examples/displays of all the data we have collected through functions" << '\n';
+	cout << "Strike any key to continue ^-^" << '\n';
+	cin.get();
 	vector<Province> Welt;
 	Welt = populateProvinceWPops();
 
@@ -37,7 +37,6 @@ int main(int argc, char* argv[]) {
 	for(uint y = 0; y < Welt.size(); y++) {
 		cout << Welt[y].uID << ":\n";
 		for(uint x = 0; x < Welt[y].Populations.size(); x++) {
-			//cout << "\t szType Size: " << Welt[y].Populations[x].szType.length() << "\n";
 			cout << "\t szType: " << Welt[y].Populations[x].szType << "\n";
 			cout << "\t szCulture: " << Welt[y].Populations[x].szCulture << "\n";
 			cout << "\t szReligion: " << Welt[y].Populations[x].szReligion << "\n";
@@ -117,41 +116,5 @@ int main(int argc, char* argv[]) {
 		}
 	}
 
-	
-	//orgIntoState(Welt);
-	
-	
-	for(int i = 0; i < Welt.size(); i++) {
-		if(Welt[i].szGood.compare("Sand") == 0) {
-			cout << Welt[i].uID << " : " << Welt[i].szGood << endl;
-		}
-	}
-
-	return 0;
-	/*
-
-	
-	for(int D = 0; D < (365 * (2000-1836)); D++) {
-		for(int x = 0; x < Welt.size(); x++) {
-			Welt[x].popGrowth();
-		}
-		cout << "Day: " << D << endl;
-	}*/
-	unsigned long int WorldPop = 0; 
-
-       	for(int i = 0; i < Welt.size(); i++) {
-		for(int y = 0; y < Welt[i].Populations.size(); y++) {
-			WorldPop = WorldPop + Welt[i].Populations[y].uSize;
-		}
-	}
-	cout << "World Population: " << WorldPop << endl;
-        
-
-
-
-
-
-
-        
-        return EXIT_SUCCESS;
+	return EXIT_SUCCESS;
 }
