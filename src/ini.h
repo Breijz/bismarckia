@@ -13,21 +13,28 @@
 
 
 enum IniTypes {
-	INI_KEYNAME,
-	INI_KEYVALUE,
-	INI_ENDBRACKET,
-	INI_OPENBRACKET,
-	INI_CAPSULE
+	INI_EMPTY,	//	0
+	INI_SECTION,	//	1
+	INI_KEYNAME,	//	2
+	INI_KEYVALUE,	//	3
+	INI_ENDBRACKET,	//	4
+	INI_OPENBRACKET,//	5
+	INI_CAPSULE	//	6
 };
 
-struct Key {
-	IniTypes itType;
-	string szKeyName;
-	string szKeyValue;
+struct Token {
+	IniTypes itKeyNameType;
+	IniTypes itKeyValueType;
+	std::string szKeyName;
+	std::string szKeyValue;
 };
 
-void szStripTabs(std::string_view szLine);
+//void szStripTabs(std::string_view szLine);
 
-void szStripComments(std::string_view szLine);
+//void szStripComments(std::string_view szLine);
 
-std::multimap<std::string, IniTypes> mapReadIniFile(std::string szFile);
+std::vector<std::string> vecSeperateAtCR(std::string &szLine);
+
+std::string szCleanString(std::string &szLine);
+
+std::vector<Token> mapReadIniFile(std::string szFile);

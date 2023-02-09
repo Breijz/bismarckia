@@ -33,7 +33,7 @@ string szStripTabs(string szLine) {
 	    if(szLine[i] != '\t' && szLine[i] != ' ' && szLine[i] != '\r') {
 	        Ans.push_back(szLine[i]);
 	    } else if(szLine[i] == ' ') {
-		    if(isdigit(szLine[i-1]) == true && isdigit(szLine[i+1]) == true) {
+		    if(isdigit(szLine[i-2]) == true && isdigit(szLine[i+2]) == true) {
 			    Ans.push_back(',');
 		    }
 	    }
@@ -58,6 +58,15 @@ string szStripComments(string &szLine) {
 string szStripSpace(string &szLine) {
 	string Ans;
 	for(uint uPos = 0; uPos < szLine.length(); uPos++) {
+		if(szLine[uPos] == '{') {
+			for(; uPos < szLine.length(); uPos++) {
+				Ans.push_back(szLine[uPos]);
+				if(szLine[uPos] == '}') {
+					uPos++;
+					break;
+				}
+			}
+		}
 		if(szLine[uPos] != ' ' && szLine[uPos] != '\t') {
 			Ans.push_back(szLine[uPos]);
 		}
@@ -67,8 +76,25 @@ string szStripSpace(string &szLine) {
 
 
 
-multimap<string, IniTypes> mapReadIniFile(string szFile) {
-	multimap<string, IniTypes> mapToken;
+
+vector<string> vecSeperateAtCR(string &szLine) {
+	vector<string> sepLines;
+	string finLine;
+	size_t pos;
+
+	while((pos = szLine.find("\r")) != string::npos) {
+		sepLines.push_back(szLine.substr(0, pos));
+		szLine.erase(0, (pos+1));
+	}
+	sepLines.push_back(szLine);
+
+	return sepLines;
+}
+
+
+
+vector<Token> mapReadIniFile(string szFile) {
+	vector<Token> vecToken;
 	vector<string> szFileLines;
 	string szLine;
 	ifstream Readfile;
@@ -76,11 +102,19 @@ multimap<string, IniTypes> mapReadIniFile(string szFile) {
 	Readfile.open(szFile);
 
 	while(getline(Readfile, szLine)) {
-		szLine = szStripSpace(szLine);
-		szLine = szStripTabs(szLine);
+		//szLine = szStripSpace(szLine);
+		//szLine = szStripTabs(szLine);
 		if(szLine[0] != '#' && szLine.empty() == false) {
+			szLine = szStripTabs(szLine);
 			szLine = szStripComments(szLine);
-			szFileLines.push_back(szLine);
+			vector<string> temp = vecSeperateAtCR(szLine);
+			for(uint i = 0; i < temp.size(); i++) {
+				szLine = temp[i];
+				//szLine = szStripComments(szLine);
+				if(szLine.empty() == false) {
+					szFileLines.push_back(szLine);
+				}
+			}
 		}
 	}
 	Readfile.close();
@@ -88,79 +122,67 @@ multimap<string, IniTypes> mapReadIniFile(string szFile) {
 	for(uint uVecPos = 0; uVecPos < szFileLines.size(); uVecPos++) {
 		uint uDelimPos = szFileLines[uVecPos].find("=");	
 		//cout << "File: " << szFileLines[uVecPos] << endl;
-		string szKeyName = szFileLines[uVecPos].substr(0, uDelimPos);
-		string szKeyValue = szFileLines[uVecPos].substr((uDelimPos + 1), szFileLines[uVecPos].length());
-		cout << "szKeyName: "<< szKeyName << endl;
-		cout << "szKeyValue: " << szKeyValue << endl;
 
 
 		/*
-		if(uDelimPos == string::npos || uDelimPos > szFileLines[uVecPos].length()) {
-			if(szFileLines[uVecPos][0] == '{') {
-				mapToken.insert(pair<IniTypes, string>(INI_OPENBRACKET, "{"));
-				cout << "test\n";
-			} else if(szFileLines[uVecPos][0] == '}') {
-				mapToken.insert(pair<IniTypes, string>(INI_ENDBRACKET, "}"));
+		 * Will trigger for these lines
+		 * {
+		 * ...
+		 * }
+		 */
+		if(uDelimPos == string::npos || uDelimPos > szFileLines[uVecPos].size()) {
+			if(szFileLines[uVecPos].find("{") != string::npos) {
+				struct Token TokSetup;
+				TokSetup.itKeyNameType = INI_OPENBRACKET;
+				TokSetup.itKeyValueType = INI_EMPTY;
+				TokSetup.szKeyName = "{";
+				vecToken.push_back(TokSetup);
+			} else if(szFileLines[uVecPos].find("}") != string::npos) {
+				struct Token TokSetup;
+				TokSetup.itKeyNameType = INI_ENDBRACKET;
+				TokSetup.itKeyValueType = INI_EMPTY;
+				TokSetup.szKeyName = "}";
+				vecToken.push_back(TokSetup);
 			} else {
-				//cout << "Debug: |" << szFileLines[uVecPos] << endl;
+				//cout << "Debug: " << szFileLines[uVecPos] << endl;
 			}
-		} else if(uDelimPos != string::npos) {
-			mapToken.insert(pair<IniTypes, string>(INI_KEYNAME, szFileLines[uVecPos].substr(0, uDelimPos)));
-			if(szFileLines[uVecPos].find("{", (uDelimPos + 1)) != string::npos && szFileLines[uVecPos].find("}", (uDelimPos + 1)) == string::npos) {
-				mapToken.insert(pair<IniTypes, string>(INI_OPENBRACKET, "{"));
-			} else if(szFileLines[uVecPos].find("{", (uDelimPos + 1)) != string::npos && szFileLines[uVecPos].find("}", (uDelimPos + 1)) != string::npos) {
-				mapToken.insert(pair<IniTypes, string>(INI_CAPSULE, szFileLines[uVecPos].substr((szFileLines[uVecPos].find(" ", uDelimPos) + 1), szFileLines[uVecPos].length())));
-			} else if(szFileLines[uVecPos].find("{", (uDelimPos + 1)) == string::npos && szFileLines[uVecPos].find("}", (uDelimPos + 1)) == string::npos) {
-				mapToken.insert(pair<IniTypes, string>(INI_KEYVALUE, szFileLines[uVecPos].substr((szFileLines[uVecPos].find(" ", uDelimPos) + 1), szFileLines[uVecPos].length())));
-			}
-		}*/
 
-		// szKeyName is never a { or } so we dont need to worry about it ^-^ 
-		if(szKeyName.empty() == false && szKeyName.find("}") == string::npos) {
-			//TokenSetup.Type = "INI_KEYNAME";
-			//TokenSetup.Value = Key.szKeyName;
-			//Token_Map.push_back(TokenSetup);
-			//mapToken.insert(pair<IniTypes, string>(INI_KEYNAME, szKeyName));
-			//mapToken.emplace(INI_KEYNAME, szKeyName);
-			mapToken.emplace(szKeyName, INI_KEYNAME);
 		} 
+		/* Will trigger for these lines...
+		 * Key = {
+		 * 	cost = ...
+		 * 	bool = yes
+		 */
+		else {
+			string szKeyName = szFileLines[uVecPos].substr(0, uDelimPos);
+			string szKeyValue = szFileLines[uVecPos].substr((uDelimPos + 1), szFileLines[uVecPos].length());
 
-		
-		if(szKeyValue.empty() == false && szKeyValue[0] != '{' && szKeyValue[0] != '}' ) {
-			//TokenSetup.Type = "INI_KEYVALUE";
-			//TokenSetup.Value = Key.szKeyValue;
-			//Token_Map.push_back(TokenSetup);
-			//mapToken.insert(pair<IniTypes, string>(INI_KEYVALUE, szKeyValue));
-			mapToken.emplace(szKeyValue, INI_KEYVALUE);
-		} /*else if(szKeyValue.empty() == false && szKeyValue[0] == '{' ) {
-			//TokenSetup.Type = "INI_KEYVALUE";
-			//TokenSetup.Value = Key.szKeyValue;
-			//Token_Map.push_back(TokenSetup);
-			mapToken.insert(pair<IniTypes, string>(INI_CAPSULE, szKeyValue));
-		}*/
+			struct Token TokSetup;
 
-		// szKeyValue is sometimes { or } so we must handle them first before szKeyValue 
-		if(szKeyValue.compare("}") == 0) {
-			//TokenSetup.Type = "INI_ENDBRACKET";
-			//TokenSetup.Value = Key.szKeyValue;
-			//Token_Map.push_back(TokenSetup);
-			//mapToken.insert(pair<IniTypes, string>(INI_ENDBRACKET, "}"));
-			mapToken.emplace("}", INI_ENDBRACKET);
+			if(szKeyValue.compare("{") == 0) {
+				TokSetup.itKeyNameType = INI_SECTION;
+				TokSetup.itKeyValueType = INI_OPENBRACKET;
+				TokSetup.szKeyName = szKeyName;
+				TokSetup.szKeyValue = szKeyValue;
+				vecToken.push_back(TokSetup);
+			} else {
+				TokSetup.itKeyNameType = INI_KEYNAME;
+				TokSetup.szKeyName = szKeyName;
+				if(szKeyValue.find("{") != string::npos && szKeyValue.find("}") != string::npos) {
+					TokSetup.itKeyValueType = INI_CAPSULE;
+					TokSetup.szKeyValue = szKeyValue;
+				} else {
+					TokSetup.itKeyValueType = INI_KEYVALUE;
+					TokSetup.szKeyValue = szKeyValue;
+				}
+
+				vecToken.push_back(TokSetup);
+			}
+
 		}
-		if(szKeyValue.compare("{") == 0) {
-			//TokenSetup.Type = "INI_OPENBRACKET";
-			//TokenSetup.Value = Key.szKeyValue;
-			//Token_Map.push_back(TokenSetup);
-			//mapToken.insert(pair<IniTypes, string>(INI_OPENBRACKET, "{"));
-			mapToken.emplace("{", INI_OPENBRACKET);
-		} 
-
-
-		szKeyName.erase(0, string::npos);
-		szKeyValue.erase(0, string::npos);
 	}
 
-	return mapToken;
+	return vecToken;
 }
 
 

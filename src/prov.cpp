@@ -14,6 +14,7 @@ using namespace std;
 
 
 
+/*
 uint findProvID(vector<Province> &Welt, uint ProvID) {
 	for(uint Pos = 0; Pos < Welt.size(); Pos++) {
 		if(Welt[Pos].uID == ProvID) {
@@ -31,7 +32,7 @@ vector<Province> populateProvinceWPops() {
 	for(uint ListPos = 0; ListPos < Listing.size(); ListPos++) {
 		uint uEndBracket = 0;
 		uint uOpenBracket = 0;
-		vector<Token> Token_Map = readIniFile(Listing[ListPos], true);
+		vector<Token> Token_Map = mapReadIniFile(Listing[ListPos]);
 		//Start Reading through Token_Map
 		for(uint TokPos = 0; TokPos < Token_Map.size(); TokPos++) {
 			if(isNumber(Token_Map[TokPos].Value) == true) {
@@ -102,10 +103,8 @@ vector<Province> populateProvinceWPops() {
 
 
 
-/*
- * This function takes in a vector of Provinces and adds the attributes defined in /history/province/???/ 
- * to them, to use it populateProvWPops must be used first.
- */
+// This function takes in a vector of Provinces and adds the attributes defined in /history/province/???/ 
+// to them, to use it populateProvWPops must be used first.
 vector<Province> populateProvinceWAttrib(vector<Province> ProvWPop, char* File) {
 	vector<Province> ProvFS = ProvWPop;
         KeyResult Key;
@@ -113,13 +112,16 @@ vector<Province> populateProvinceWAttrib(vector<Province> ProvWPop, char* File) 
         vector<string> Listing = listingOfFolder(File, false);
         string szFile;
 
-         /* This code isnt expandable and will only work with the files shipped in the original Vic2, (w/o dlc) */
+         // This code isnt expandable and will only work with the files shipped in the original Vic2, (w/o dlc) 
 
 
         for(uint i = 0; i < Listing.size(); i++) {
                 szFile = File + Listing[i];
-                Key = seperateKey(Listing[i], '-', false);
-		string t_szProv = Key.szKeyName.substr((Key.szKeyName.find_last_of("/") + 1), Key.szKeyName.length());
+                //Key = seperateKey(Listing[i], '-', false);
+		string szKeyname = Listing[i].substr(0, Listing[i].find_first_of("-"));
+		string szKeyValue = Listing[i].substr(Listing[i].find_first_of("-"), Listing[i].length());
+
+		string t_szProv = szKeyName.substr((szKeyName.find_last_of("/") + 1), szKeyName.length());
 
                 uint ProvID = stoi(t_szProv);
 
@@ -140,7 +142,7 @@ vector<Province> populateProvinceWAttrib(vector<Province> ProvWPop, char* File) 
 
 
 
-		Token_Map = readIniFile(szFile, true);
+		Token_Map = mapReadIniFile(szFile);
 
 
 		for(uint z = 0; z < Token_Map.size(); z++) {
@@ -280,7 +282,7 @@ vector<Province> populateProvinceWAttrib(vector<Province> ProvWPop, char* File) 
 vector<Province> orgProvIntoContinent(vector<Province> Welt) {
 	vector<Province> ProvFS = Welt;
 
-	vector<Token> Token_Map = readIniFile("game/map/continent.txt", true);
+	vector<Token> Token_Map = mapReadIniFile("game/map/continent.txt");
 
 	// Begin reading through Token_Map
 	for(uint TokPos = 0; TokPos < Token_Map.size(); TokPos++) {
@@ -323,6 +325,7 @@ vector<Province> orgProvIntoContinent(vector<Province> Welt) {
 
 	return ProvFS;
 }
+*/
 
 
 
