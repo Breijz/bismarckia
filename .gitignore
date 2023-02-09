@@ -26,7 +26,4 @@
 
 game
 *.txt
-bmserver
-bmclient
-ini
 core.*
