@@ -1,32 +1,18 @@
-#ifndef pop_H
-#define pop_H
+#pragma once
 
 #include <iostream>
 #include <string>
 #include <vector>
 
 
-using namespace std;
 
 //Minor rework, we'll just add things as we need them.
 class Pop {
         public:
-                Pop(){
-                        szType = "NULL";
-                        szCulture = "NULL";
-                        szReligion = "NULL";
-                        szRebelType = "NULL";
-                        fMilitancy = 0;
-                        uSize = 0;
-                }
-
-        public:
-                string szType;
-                string szCulture;
-                string szReligion;
-                string szRebelType;
-                float fMilitancy;
-                uint uSize;
+                std::string szType;
+                std::string szCulture;
+                std::string szReligion;
+                std::string szRebelType;
+                float fMilitancy = 0.0;
+                uint uSize = 0;
 };
-
-#endif

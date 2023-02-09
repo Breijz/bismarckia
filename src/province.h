@@ -1,5 +1,4 @@
-#ifndef province_H
-#define province_H
+#pragma once
 
 #include <iostream>
 #include <string>
@@ -8,59 +7,34 @@
 #include "pop.h"
 #include "factory.h"
 
-using namespace std;
 
 
-
-typedef struct {
-	string szType;
+struct Revolt {
+	std::string szType;
 	bool bController;
-} Revolt;
+};
 
 
 class Province {
-
         public:
-        Province() {
-                uID = 0;			// Province ID, there is no province 0 so we use this as a default
-		szName = "NULL";		// Null values for strings since we cant predict what they ought to be
-                szOwner = "NULL";
-                szController = "NULL";
-                szGood = "NULL";
-
-                uLiferating = 0;		// Liferating of the province, this is never negative or a decimal, (base game its 15-50)
-                uNavalBase = 0;			// Level of Navalbase, 0 = No Base
-		uFort = 0;			// ^^^
-		uRailroad = 0;			// ^^^
-		bColonial = false;		// Is the Province integrated or not? for us to change this to true we need for bColony to be true prior	
-		bColony = false;		// Is the Province *just* colonised
-		bIsSlave = false;		// Is the province a slave state? in these states slaves can exist
-		szTerrain = "NULL";		// Only used for ~3 provinces, all of which are Islands.
-		szContinent = "NULL";		// We define continent as a string to allow for others to create contients :3
-
-        }
-
-        public:
-                uint uID;
-		string szName;
-                string szOwner;
-                string szController;
-                vector<string> Cores;
-                string szGood;
-                uint uLiferating;
-                uint uNavalBase;
-		uint uFort;
-		uint uRailroad;
-		bool bColonial;
-		bool bColony;
-		bool bIsSlave;
-		string szTerrain;
-		string szClimate;
-		string szContinent;
-                vector<Pop> Populations;
-		vector<Revolt> Rebellions;
-		vector<Factory> Factories;
+                uint uID = 0; 			// Province ID, there is no province 0 so we use this as a default
+		std::string szName;
+                std::string szOwner;
+                std::string szController;
+                std::vector<std::string> Cores;
+                std::string szGood;
+                uint uLiferating = 0;		// Liferating of the province, this is never negative or a decimal, (base game its 15-50)
+                uint uNavalBase = 0;		// Level of Navalbase, 0 = No Base
+		uint uFort = 0;			// ^^^
+		uint uRailroad = 0;		// ^^^
+		bool bColonial = false;		// Is the Province integrated or not? for us to change this to true we need for bColony to be true prior	
+		bool bColony = false;		// Is the Province *just* colonised
+		bool bIsSlave = false;		// Is the province a slave state? in these states slaves can exist
+		std::string szTerrain;		// Only used ~3 Provinces, all of which are islands afaik
+		std::string szClimate;
+		//string szContinent;	
+                std::vector<Pop> Populations;
+		std::vector<Revolt> Rebellions;
+		std::vector<Factory> Factories;
 
 };
-
-#endif

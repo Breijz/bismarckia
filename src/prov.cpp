@@ -239,7 +239,7 @@ vector<Province> populateProvinceWAttrib(vector<Province> ProvWPop, char* File) 
 					ProvFS[ProvPos].Factories.push_back(FactSetup);
 				} else
 				if(Token_Map[z].Value.compare("revolt") == 0) {
-					Revolt RevSetup;
+					struct Revolt RevSetup;
 					for(;z < Token_Map.size(); z++) {
 						if(Token_Map[z].Type.compare("INI_ENDBRACKET") == 0) {
 							break;

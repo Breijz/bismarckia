@@ -1,5 +1,4 @@
-#ifndef prov_H
-#define prov_H
+#pragma once
 
 #include <iostream>
 #include <vector>
@@ -10,12 +9,11 @@
 #include "ini.h"
 #include "filelisting.h"
 
-using namespace std;
 
-vector<Province> populateProvinceWPops();
 
-vector<Province> populateProvinceWAttrib(vector<Province> ProvWPop, char* File);
+std::vector<Province> populateProvinceWPops();
 
-vector<Province> orgProvIntoContinents(vector<Province> Welt);
+std::vector<Province> populateProvinceWAttrib(std::vector<Province> ProvWPop, char* File);
 
-#endif
+std::vector<Province> orgProvIntoContinents(std::vector<Province> Welt);
+

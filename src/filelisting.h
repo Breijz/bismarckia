@@ -3,6 +3,5 @@
 #include <vector>
 
 
-using namespace std;
 
-vector<string> listingOfFolder(char* Directory, bool keepFilePath);
+std::vector<std::string> listingOfFolder(char* Directory, bool keepFilePath);

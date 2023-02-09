@@ -1,5 +1,4 @@
-#ifndef ini_H
-#define ini_H
+#pragma once
 
 #include <iostream>
 #include <fstream>
@@ -11,28 +10,24 @@
 #include "pop.h"
 #include "province.h"
 
-using namespace std;
 
-typedef struct {
-    string szKeyName;
-    string szKeyValue;
-} KeyResult;
 
-typedef struct {
-        string Type;
-        string Value;
-} Token;
+enum IniTypes {
+	INI_KEYNAME,
+	INI_KEYVALUE,
+	INI_ENDBRACKET,
+	INI_OPENBRACKET,
+	INI_CAPSULE
+};
 
-string stripTabs(string szLine);
+struct Key {
+	IniTypes itType;
+	string szKeyName;
+	string szKeyValue;
+};
 
-KeyResult seperateKey(string Key, char Delim, bool bKeepSpace);
+void szStripTabs(std::string_view szLine);
 
-bool isKeyNamePop(string szLine);
+void szStripComments(std::string_view szLine);
 
-bool isNumber(string szLine);
-
-vector<Token> readIniFile(string File, bool bCheckKeyValue);
-
-vector<string> seperateAtCR(string szLine, string szDelim);
-
-#endif
+std::multimap<std::string, IniTypes> mapReadIniFile(std::string szFile);
