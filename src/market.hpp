@@ -34,6 +34,18 @@ class Market {
 
 	public:
 		vector<Good> listOfGoods;
+
+	private:
+		void initalise() {
+			vector<Token> Token_Map = readIniFile("game/common/goods.txt", true);
+
+			for(uint TokPos = 0; TokPos < Token_Map.size(); TokPos++) {
+				uint uEndBracket = 0;
+				uint uOpenBracket = 0;
+
+			}
+
+		}
 };
 
 #endif

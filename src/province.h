@@ -36,6 +36,7 @@ class Province {
 		bColony = false;		// Is the Province *just* colonised
 		bIsSlave = false;		// Is the province a slave state? in these states slaves can exist
 		szTerrain = "NULL";		// Only used for ~3 provinces, all of which are Islands.
+		szContinent = "NULL";		// We define continent as a string to allow for others to create contients :3
 
         }
 
@@ -55,6 +56,7 @@ class Province {
 		bool bIsSlave;
 		string szTerrain;
 		string szClimate;
+		string szContinent;
                 vector<Pop> Populations;
 		vector<Revolt> Rebellions;
 		vector<Factory> Factories;

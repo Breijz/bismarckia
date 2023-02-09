@@ -7,6 +7,7 @@
 // These use the better system of having a header file include a source file
 // The rest of the ones above ought to be converted at some point
 // aswell as cleaned up         -Breizh
+#include "prov.h"
 #include "ini.h"
 #include "filelisting.h"
 #include "factory.h"

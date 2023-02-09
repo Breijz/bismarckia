@@ -35,8 +35,4 @@ vector<Token> readIniFile(string File, bool bCheckKeyValue);
 
 vector<string> seperateAtCR(string szLine, string szDelim);
 
-vector<Province> populateProvinceWPops();
-
-vector<Province> populateProvinceWAttrib(vector<Province> ProvWPop, char* Folder);
-
 #endif
