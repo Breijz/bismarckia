@@ -1,17 +1,13 @@
 Bismarckia
 ==========  
   
+See docs/getstarted.md for more information  
 
-File Structure
---------------
-/ - Root of directory (this includes this readme)  
-/src - source code  
-/neu - relic, used for anything custom made  
-/game - contains game files, it is excluded in the .gitignore, files from the orignal vic2 should be put in here (for example /game/history)  
-
-Compiling
-=========
+## TLDR
+To compile, you just need a working C++ Compiler, (GNU) Make, and a Linux or Compatible system.  
   
-On Linux
---------
-This is only tested on Artix (as thats the distro I use, it compiles with gcc + gnu Make, to compile just type 'make' 
+1. `make`  
+2. `ln -s "~/.local/share/steam/steamapps/common/Victoria 2" game`  
+3. `./bmserver`  
+  
+This assumes your vic2 install is in `~/.local/share/steam/steamapps/common/` change it accordingly if you have it somewhere else, in steam atleast you can right click vic2 and click browse local files.  
