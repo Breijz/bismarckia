@@ -62,7 +62,7 @@ vector<SectionRange> spListGrandSections(vector<Token> const& TokMap) {
 				if(TokMap[uTokPos].itKeyNameType == INI_ENDBRACKET || TokMap[uTokPos].itKeyValueType == INI_ENDBRACKET ) { uEndBracket++; }
 
 				if(uEndBracket == uOpenBracket) {
-					cout << "spListGrandSections breaking...\n";
+					//cout << "spListGrandSections breaking...\n";
 					SectSetup.uEnd = uTokPos;
 					Locations.push_back(SectSetup);
 					break;

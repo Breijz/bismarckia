@@ -8,7 +8,7 @@
 
 using namespace std;
 
-struct Colour {
+struct Farbe {
 	char R;
 	char G;
 	char B;
@@ -17,7 +17,7 @@ struct Colour {
 struct Good {
 	string szCategory;
 	string szName;
-	float fPrice;
+	float fCost;
 	bool bAvailStart = true;
 	bool bTradeable = true;		// These are only used for precious_metal so in theory we could merge them
 	bool bMoney = false;		// but we wont for the sake of accuracy

@@ -6,10 +6,19 @@
 #include "pop.h"
 #include "filelisting.h"
 #include "factory.h"
+#include "goods.h"
 
 using namespace std;
 
 int main() {
+
+	vector<Good> GoodList = SetupGoods();
+
+	for(uint i = 0; i < GoodList.size(); i++) {
+		cout << GoodList[i].fCost << endl;
+	}
+
+	return 0;
 	vector<string> PopTypes = szGiveListOfPops();
 
 
