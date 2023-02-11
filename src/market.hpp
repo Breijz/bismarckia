@@ -1,5 +1,4 @@
-#ifndef market_HPP
-#define market_HPP
+#pragma once
 
 #include <iostream>
 #include <string>
@@ -9,13 +8,13 @@
 
 using namespace std;
 
-typedef struct {
+struct Colour {
 	char R;
 	char G;
 	char B;
-} Farbe;
+};
 
-typedef struct {
+struct Good {
 	string szCategory;
 	string szName;
 	float fPrice;
@@ -24,7 +23,7 @@ typedef struct {
 	bool bMoney = false;		// but we wont for the sake of accuracy
 	bool bOverseasPenalty = false;
 	Farbe Colour;
-} Good;
+};
 
 
 class Market {
@@ -35,17 +34,4 @@ class Market {
 	public:
 		vector<Good> listOfGoods;
 
-	private:
-		void initalise() {
-			vector<Token> Token_Map = readIniFile("game/common/goods.txt", true);
-
-			for(uint TokPos = 0; TokPos < Token_Map.size(); TokPos++) {
-				uint uEndBracket = 0;
-				uint uOpenBracket = 0;
-
-			}
-
-		}
 };
-
-#endif

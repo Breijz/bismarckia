@@ -10,8 +10,6 @@
 using namespace std;
 
 int main() {
-	//vector<Token> vecToken = mapReadIniFile("game/common/goods.txt");
-	
 	vector<string> PopTypes = szGiveListOfPops();
 
 
@@ -20,7 +18,6 @@ int main() {
 
 	populateProvinceWAttrib(Welt);
 	
-	return 0;
 
 	for(int y = 0; y < Welt.size(); y++) {
 		cout << Welt[y].uID << ":\n";

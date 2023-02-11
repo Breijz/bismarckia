@@ -10,5 +10,7 @@ CPP=g++
 compile:
 	${CPP} src/main.cpp\
 		src/ini.cpp\
-		-std=c++17 -o bmserver
+		src/prov.cpp\
+		src/filelisting.cpp\
+		-std=c++17 -o bmserver -g
 

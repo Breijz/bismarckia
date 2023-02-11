@@ -46,6 +46,38 @@ SectionRange srGiveSectionRange(vector<Token> const& TokMap, std::string_view sz
 
 
 
+vector<SectionRange> spListGrandSections(vector<Token> const& TokMap) {
+	vector<SectionRange> Locations;
+
+	for(uint uTokPos = 0; uTokPos < TokMap.size(); uTokPos++) {
+		if(TokMap[uTokPos].itKeyNameType == INI_SECTION) {
+			uint uOpenBracket = 0;
+			//if(TokMap[uTokPos].itKeyValueType == INI_OPENBRACKET) { uOpenBracket++; }
+			uint uEndBracket = 0;
+			struct SectionRange SectSetup;
+			SectSetup.szSection = TokMap[uTokPos].szKeyName;
+			SectSetup.uStart = uTokPos;
+			for(; uTokPos < TokMap.size(); uTokPos++) {
+				if(TokMap[uTokPos].itKeyNameType == INI_OPENBRACKET || TokMap[uTokPos].itKeyValueType == INI_OPENBRACKET ) { uOpenBracket++; }
+				if(TokMap[uTokPos].itKeyNameType == INI_ENDBRACKET || TokMap[uTokPos].itKeyValueType == INI_ENDBRACKET ) { uEndBracket++; }
+
+				if(uEndBracket == uOpenBracket) {
+					cout << "spListGrandSections breaking...\n";
+					SectSetup.uEnd = uTokPos;
+					Locations.push_back(SectSetup);
+					break;
+				}
+			}
+
+		}
+	}
+
+
+	return Locations;
+}
+
+
+
 bool bCheckIfNumber(std::string_view szLine) {
 	for(uint i = 0; i < szLine.length(); i++) {
 		if(isdigit(szLine[i]) == true) {

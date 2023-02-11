@@ -24,6 +24,7 @@
 *.out
 *.app
 
+bmserver
 game
 *.txt
 core.*

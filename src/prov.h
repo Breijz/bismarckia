@@ -11,6 +11,12 @@
 
 
 
+SectionRange srGiveSectionRange(std::vector<Token> const& TokMap, std::string_view szLine);
+
+std::vector<SectionRange> spListGrandSections(std::vector<Token> const& TokMap);
+
+bool bCheckIfNumber(std::string_view szLine);
+
 std::vector<std::string> szGiveListOfPops();
 
 bool bIsStrPop(std::string_view szLine, std::vector<std::string> &PopTypes);
