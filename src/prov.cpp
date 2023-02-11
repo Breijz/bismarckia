@@ -148,8 +148,104 @@ vector<Province> populateProvinceWPops(vector<string> &PopTypes) {
 
 
 
-vector<Province> populateProvinceWAttrib() {
+vector<Province> populateProvinceWAttrib(vector<Province> &Welt) {
 	vector<string> szFolderList = listingOfFolder("game/history/provinces/", true);
+
+	for(uint uFLV = 0; uFLV < szFolderList.size(); uFLV++) {
+		vector<string> szFileList = listingOfFolder(szFolderList[uFLV], true);
+		for(uint uFLPos = 0; uFLPos < szFileList.size(); uFLPos++) {
+			string szFileName = szFileList[uFLPos].substr((szFileList[uFLPos].find_last_of("/") + 1), (1 - szFileList[uFLPos].find_last_of(".")));
+			uint uProvID = stoi(szFileName.substr(0, (szFileName.find_last_of("-") - 1)));
+			string szProvName = szFileName.substr(szFileName.find_first_of("-") + 2, szFileName.length());		// TODO: For some reason having szFileName.find_first/last_of(".") here doesnt work?
+			szProvName = szProvName.substr(0, szProvName.find_first_of("."));					// So we must do this for... reasons... -breizh
+			
+			uint uProvPos = 0;
+			bool bFoundProv = false;
+			for(uint i = 0; i < Welt.size(); i++) {
+				if(uProvID == Welt[i].uID) {
+					uProvPos = i;
+					bFoundProv = true;
+				}
+			}
+			if(bFoundProv == false) {
+				cout << uProvID << " Not Found!\n";
+			}
+
+			vector<Token> TokMap = mapReadIniFile(szFileList[uFLPos]);
+			for(uint uTokPos = 0; uTokPos < TokMap.size(); uTokPos++) {
+				if(TokMap[uTokPos].itKeyNameType == INI_KEYNAME) {
+
+					if(TokMap[uTokPos].szKeyName.compare("trade_goods") == 0) {
+						Welt[uProvPos].szGood = TokMap[uTokPos].szKeyValue;
+					} else
+					if(TokMap[uTokPos].szKeyName.compare("life_rating") == 0) {
+						Welt[uProvPos].uLiferating = stoi(TokMap[uTokPos].szKeyValue);
+					} else
+					if(TokMap[uTokPos].szKeyName.compare("owner") == 0) {
+						Welt[uProvPos].szOwner = TokMap[uTokPos].szKeyValue;
+					} else
+					if(TokMap[uTokPos].szKeyName.compare("add_core") == 0) {
+						Welt[uProvPos].Cores.push_back(TokMap[uTokPos].szKeyValue);
+					} else
+					if(TokMap[uTokPos].szKeyName.compare("controller") == 0) {
+						Welt[uProvPos].szController = TokMap[uTokPos].szKeyValue;
+					} else
+					if(TokMap[uTokPos].szKeyName.compare("colony") == 0) {
+						if(TokMap[uTokPos].szKeyValue.compare("yes") == 0) {
+							Welt[uProvPos].bColony = true;
+						} else {
+							Welt[uProvPos].bColony = false;
+						}
+					} else
+					if(TokMap[uTokPos].szKeyName.compare("is_slave") == 0) {
+						if(TokMap[uTokPos].szKeyValue.compare("yes") == 0) {
+							Welt[uProvPos].bIsSlave = true;
+						} else {
+							Welt[uProvPos].bIsSlave = false;
+						}
+						
+					} else
+					if(TokMap[uTokPos].szKeyName.compare("fort") == 0) {
+						Welt[uProvPos].uFort = stoi(TokMap[uTokPos].szKeyValue);
+					} else
+					if(TokMap[uTokPos].szKeyName.compare("railroad") == 0) {
+						Welt[uProvPos].uRailroad = stoi(TokMap[uTokPos].szKeyValue);
+					} else
+					if(TokMap[uTokPos].szKeyName.compare("naval_base") == 0) {
+						Welt[uProvPos].uNavalBase = stoi(TokMap[uTokPos].szKeyValue);
+					} else
+					if(TokMap[uTokPos].szKeyName.compare("colonial") == 0) {
+						if(TokMap[uTokPos].szKeyValue.compare("yes") == 0) {
+							Welt[uProvPos].bColonial = true;
+						} else {
+							Welt[uProvPos].bColonial = false;
+						}
+					} else
+					if(TokMap[uTokPos].szKeyName.compare("terrain") == 0) {
+						Welt[uProvPos].szTerrain = TokMap[uTokPos].szKeyValue;
+					}
+					else {
+						cout << "Error in " << Welt[uProvPos].uID << " : " << TokMap[uTokPos].szKeyName << " : " << TokMap[uTokPos].szKeyValue << endl;
+					}
+
+				} else if(TokMap[uTokPos].itKeyNameType == INI_SECTION) {
+					if(TokMap[uTokPos].szKeyName.compare("state_building") == 0) {
+						for(; uTokPos < TokMap.size(); uTokPos++) {													// TODO : Implement
+							if(TokMap[uTokPos].itKeyNameType == INI_ENDBRACKET || TokMap[uTokPos].itKeyValueType == INI_ENDBRACKET) { break; }
+						}
+					} else
+					if(TokMap[uTokPos].szKeyName.compare("revolt") == 0) {
+						for(; uTokPos < TokMap.size(); uTokPos++) {													// TODO : Implement
+							if(TokMap[uTokPos].itKeyNameType == INI_ENDBRACKET || TokMap[uTokPos].itKeyValueType == INI_ENDBRACKET) { break; }
+						}
+					}
+				}
+			}
+			
+		}
+	}
+
+	return Welt;
 }
 
 

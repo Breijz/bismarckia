@@ -13,7 +13,8 @@ using namespace std;
     NOTE: This is inherited from serviced/src/getServices.cpp   -Breizh
 */
 
-vector<string> listingOfFolder(char* Directory, bool keepFilePath) {
+/*
+vector<string> listingOfFolder(const char* Directory, bool keepFilePath) {
     vector<string> Listing;
         if(access(Directory, F_OK) != 0) {
                 cout << "File Doesnt Exist: " << Directory << endl;
@@ -41,4 +42,21 @@ vector<string> listingOfFolder(char* Directory, bool keepFilePath) {
     }
     
     return Listing;
+}
+*/
+
+vector<string> listingOfFolder(string szDir, bool bKeepFilePath) {
+	vector<string> szListing;
+	
+	// from https://en.cppreference.com/w/cpp/filesystem/directory_iterator
+	for(auto const& entry : filesystem::directory_iterator{szDir}) {
+		szListing.push_back(entry.path());
+	}
+
+	if(bKeepFilePath == false) {
+		for(uint i = 0; i < szListing.size(); i++) {
+			szListing[i] = szListing[i].substr((szListing[i].find_last_of("/") + 1), szListing[i].length());
+		}
+	}
+	return szListing;
 }

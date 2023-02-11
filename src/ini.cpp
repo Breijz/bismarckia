@@ -46,8 +46,8 @@ string szStripTabs(string &szLine) {
 
 string szStripComments(string &szLine) {
 	uint uPos = szLine.find_first_of("#");
-	if(uPos != string::npos) {
-		return szLine.substr(0, (uPos - 1));
+	if(uPos != string::npos || uPos > szLine.length()) {
+		return szLine.substr(0, uPos);
 	} else {
 		return szLine;
 	}

@@ -16,3 +16,5 @@ std::vector<std::string> szGiveListOfPops();
 bool bIsStrPop(std::string_view szLine, std::vector<std::string> &PopTypes);
 
 std::vector<Province> populateProvinceWPops(std::vector<std::string> &PopTypes);
+
+std::vector<Province> populateProvinceWAttrib(std::vector<Province> &Welt);
