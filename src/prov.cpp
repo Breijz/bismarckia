@@ -14,318 +14,147 @@ using namespace std;
 
 
 
-/*
-uint findProvID(vector<Province> &Welt, uint ProvID) {
-	for(uint Pos = 0; Pos < Welt.size(); Pos++) {
-		if(Welt[Pos].uID == ProvID) {
-			return Pos;
-		}
-	}
-	return 0;
-}
-
-// This code is being written at 0331, it probably has errors, hopefully less errors than above code.
-vector<Province> populateProvinceWPops() {
-	vector<Province> ProvWPop;
-	vector<string> Listing = listingOfFolder("game/history/pops/1836.1.1/", true);
-
-	for(uint ListPos = 0; ListPos < Listing.size(); ListPos++) {
-		uint uEndBracket = 0;
-		uint uOpenBracket = 0;
-		vector<Token> Token_Map = mapReadIniFile(Listing[ListPos]);
-		//Start Reading through Token_Map
-		for(uint TokPos = 0; TokPos < Token_Map.size(); TokPos++) {
-			if(isNumber(Token_Map[TokPos].Value) == true) {
-				Province ProvSetup;
-				ProvSetup.uID = stoi(Token_Map[TokPos].Value);
-
-				//Start Reading through a province
-				TokPos = TokPos + 1;
-				for(;TokPos < Token_Map.size(); TokPos++) {
-					if(Token_Map[TokPos].Type.compare("INI_OPENBRACKET") == 0) { uOpenBracket++; }
-					if(Token_Map[TokPos].Type.compare("INI_ENDBRACKET") == 0) { uEndBracket++; }
-
-					if(isKeyNamePop(Token_Map[TokPos].Value) == true) {
-						Pop PopSetup;
-						PopSetup.szType = Token_Map[TokPos].Value;
-						//Begin reading through Pop
-						TokPos = TokPos + 1;
-						for(;TokPos < Token_Map.size();TokPos++) {
-							if(Token_Map[TokPos].Type.compare("INI_OPENBRACKET") == 0) { uOpenBracket++; }
-							if(Token_Map[TokPos].Type.compare("INI_ENDBRACKET") == 0) { 
-								//printf("Pushing Pop...\n"); 
-								uEndBracket++; 
-								break; 
-							}
-
-							if(Token_Map[TokPos].Type.compare("INI_KEYNAME") == 0) {
-								if(Token_Map[TokPos].Value.compare("culture") == 0) {
-									TokPos++;
-									PopSetup.szCulture.swap(Token_Map[TokPos].Value);
-								} else
-								if(Token_Map[TokPos].Value.compare("religion") == 0) {
-									TokPos++;
-									PopSetup.szReligion.swap(Token_Map[TokPos].Value);
-								} else
-								if(Token_Map[TokPos].Value.compare("size") == 0) {
-									TokPos++;
-									PopSetup.uSize = stoi(Token_Map[TokPos].Value);
-								} else
-								if(Token_Map[TokPos].Value.compare("militancy") == 0) {
-									TokPos++;
-									PopSetup.fMilitancy = stof(Token_Map[TokPos].Value);
-								} else
-								if(Token_Map[TokPos].Value.compare("rebel_type") == 0) {
-									TokPos++;
-									PopSetup.szRebelType = Token_Map[TokPos].Value;
-								}
-								else {
-									cout << "UNKNOWN! " << Token_Map[TokPos].Value << endl;
-								}
-							}
-						}
-						ProvSetup.Populations.push_back(PopSetup); 
-					}
-					if(uOpenBracket == uEndBracket) { 
-						//printf("Pushing Prov...\n"); 
-						break; 
-					}
-				}
-				ProvWPop.push_back(ProvSetup); 
-				uEndBracket = 0;
-				uOpenBracket = 0;
-			}
-		}
-	}
-
-	return ProvWPop;
-}
-
-
-
-// This function takes in a vector of Provinces and adds the attributes defined in /history/province/???/ 
-// to them, to use it populateProvWPops must be used first.
-vector<Province> populateProvinceWAttrib(vector<Province> ProvWPop, char* File) {
-	vector<Province> ProvFS = ProvWPop;
-        KeyResult Key;
-        vector<Token> Token_Map;
-        vector<string> Listing = listingOfFolder(File, false);
-        string szFile;
-
-         // This code isnt expandable and will only work with the files shipped in the original Vic2, (w/o dlc) 
-
-
-        for(uint i = 0; i < Listing.size(); i++) {
-                szFile = File + Listing[i];
-                //Key = seperateKey(Listing[i], '-', false);
-		string szKeyname = Listing[i].substr(0, Listing[i].find_first_of("-"));
-		string szKeyValue = Listing[i].substr(Listing[i].find_first_of("-"), Listing[i].length());
-
-		string t_szProv = szKeyName.substr((szKeyName.find_last_of("/") + 1), szKeyName.length());
-
-                uint ProvID = stoi(t_szProv);
-
-		bool True = false;
-		uint ProvPos = 0;
-		for(; ProvPos < ProvFS.size(); ProvPos++) {
-			if(ProvID == ProvFS[ProvPos].uID) {
-				True = true;
-				break;
-			}
-		}
-		if(True == false) {
-			cout << "ProvID: " << ProvID << " doesnt exist!\n";
-			// TODO: We probably want to create the Province if it doesnt exist, as to let one use
-			// the functions in whichever order they want
-			ProvPos = 0;
-		}
-
-
-
-		Token_Map = mapReadIniFile(szFile);
-
-
-		for(uint z = 0; z < Token_Map.size(); z++) {
-			if(Token_Map[z].Type.compare("INI_KEYNAME") == 0) {
-				if(Token_Map[z].Value.compare("trade_goods") == 0) {
-					z++;
-					ProvFS[ProvPos].szGood = Token_Map[z].Value;
-				} else
-				if(Token_Map[z].Value.compare("life_rating") == 0) {
-					z++;
-					ProvFS[ProvPos].uLiferating = stoi(Token_Map[z].Value);
-				} else
-				if(Token_Map[z].Value.compare("owner") == 0) {
-					z++;
-					ProvFS[ProvPos].szOwner = Token_Map[z].Value;
-				} else
-				if(Token_Map[z].Value.compare("add_core") == 0) {
-					z++;
-					ProvFS[ProvPos].Cores.push_back(Token_Map[z].Value);
-				} else
-				if(Token_Map[z].Value.compare("controller") == 0) {
-					z++;
-					ProvFS[ProvPos].szController = Token_Map[z].Value;
-				} else
-				if(Token_Map[z].Value.compare("colony") == 0) {
-					z++;
-					if(Token_Map[z].Value.compare("yes") == 0) {
-						ProvFS[ProvPos].bColony = true;
-					} else {
-						ProvFS[ProvPos].bColony = false;
-					}
-				} else
-				if(Token_Map[z].Value.compare("is_slave") == 0) {
-					z++;
-					if(Token_Map[z].Value.compare("yes") == 0) {
-						ProvFS[ProvPos].bIsSlave = true;
-					} else {
-						ProvFS[ProvPos].bIsSlave = false;
-					}
-					
-				} else
-				if(Token_Map[z].Value.compare("fort") == 0) {
-					z++;
-					ProvFS[ProvPos].uFort = stoi(Token_Map[z].Value);
-				} else
-				if(Token_Map[z].Value.compare("railroad") == 0) {
-					z++;
-					ProvFS[ProvPos].uRailroad = stoi(Token_Map[z].Value);
-				} else
-				if(Token_Map[z].Value.compare("naval_base") == 0) {
-					z++;
-					ProvFS[ProvPos].uNavalBase = stoi(Token_Map[z].Value);
-				} else
-				if(Token_Map[z].Value.compare("colonial") == 0) {
-					z++;
-					if(Token_Map[z].Value.compare("yes") == 0) {
-						ProvFS[ProvPos].bColonial = true;
-					} else {
-						ProvFS[ProvPos].bColonial = false;
-					}
-				} else
-				if(Token_Map[z].Value.compare("terrain") == 0) {
-					z++;
-					ProvFS[ProvPos].szTerrain = Token_Map[z].Value;
-				} else
-				if(Token_Map[z].Value.compare("state_building") == 0) {
-					Factory FactSetup;
-					for(;z < Token_Map.size(); z++) {
-						if(Token_Map[z].Type.compare("INI_ENDBRACKET") == 0) {
-							break;
-						} 
-						if(Token_Map[z].Type.compare("INI_KEYNAME") == 0) {
-							if(Token_Map[z].Value.compare("level") == 0) {
-								z++;
-								FactSetup.uLevel = stoi(Token_Map[z].Value);
-							} else
-							if(Token_Map[z].Value.compare("building") == 0) {
-								z++;
-								FactSetup.szBuilding = Token_Map[z].Value;
-							} else
-							if(Token_Map[z].Value.compare("upgrade") == 0) {
-								z++;
-								if(Token_Map[z].Value.compare("yes") == 0) {
-									FactSetup.bUpgrade = true;
-								} else {
-									FactSetup.bUpgrade = false;
-								}
-							}
-							else {
-								// TODO: This code (may) not be fully functional, here
-								// when cout debug is on itll report "state_building"
-								//cout << "Error! " << Token_Map[z].Value << " : " << Token_Map[z+1].Value << endl;
-							}
-						}
-					}
-					ProvFS[ProvPos].Factories.push_back(FactSetup);
-				} else
-				if(Token_Map[z].Value.compare("revolt") == 0) {
-					struct Revolt RevSetup;
-					for(;z < Token_Map.size(); z++) {
-						if(Token_Map[z].Type.compare("INI_ENDBRACKET") == 0) {
-							break;
-						}
-						if(Token_Map[z].Type.compare("INI_KEYNAME") == 0) {
-							if(Token_Map[z].Value.compare("type") == 0) {
-								z++;
-								RevSetup.szType = Token_Map[z].Value;
-							} else
-							if(Token_Map[z].Value.compare("controller") == 0) {
-								z++;
-								if(Token_Map[z].Value.compare("yes") == 0) {
-									RevSetup.bController = true;
-								} else {
-									RevSetup.bController = false;
-								}
-							}
-						} else {
-							// TODO: This has the same issue as state_building
-							//cout << "Error! " << Token_Map[z].Value << " : " << Token_Map[z+1].Value << endl;
-						}
-					}
-					ProvFS[ProvPos].Rebellions.push_back(RevSetup);
-				}
-				else {
-					cout << "Error in " << ProvFS[ProvPos].uID << " : " << Token_Map[z].Value << " : " << Token_Map[z+1].Value << endl;
-				}
-			}
-		}
-	}
-
-                
-        return ProvFS;
-}
-
-
-
-vector<Province> orgProvIntoContinent(vector<Province> Welt) {
-	vector<Province> ProvFS = Welt;
-
-	vector<Token> Token_Map = mapReadIniFile("game/map/continent.txt");
-
-	// Begin reading through Token_Map
-	for(uint TokPos = 0; TokPos < Token_Map.size(); TokPos++) {
-		// Check if were reading a continent
-		if(Token_Map[TokPos].Type.compare("INI_KEYNAME") == 0) {
-			string szFileContinent = Token_Map[TokPos].Value;
+SectionRange srGiveSectionRange(vector<Token> const& TokMap, std::string_view szLine) {
+	struct SectionRange RanSetup;
+	RanSetup.szSection = szLine;
+	
+	// Begin reading through the vector
+	for(uint uPos = 0; uPos < TokMap.size(); uPos++) {
+		if(TokMap[uPos].szKeyName.compare(szLine) == 0 && TokMap[uPos].itKeyNameType == INI_SECTION) {
+			RanSetup.uStart = uPos;
+			//Begin reading through the Section
 			uint uEndBracket = 0;
 			uint uOpenBracket = 0;
-			//Begin reading through the continent
-			for(TokPos = TokPos + 1; TokPos < Token_Map.size(); TokPos++) {
-				if(Token_Map[TokPos].Type.compare("INI_OPENBRACKET") == 0) { uOpenBracket++; }
-				if(Token_Map[TokPos].Type.compare("INI_ENDBRACKET") == 0) { uEndBracket++; }
-
-				// Check if weve hit the Provinces stuff
-				if(Token_Map[TokPos].Value.compare("provinces") == 0) {
-					for(uint TokPos = 0; TokPos < Token_Map.size(); TokPos++) {
-						if(Token_Map[TokPos].Type.compare("INI_OPENBRACKET") == 0) { uOpenBracket++; }
-						// Since we dont have any subsections in provinces we can just escape through the endbracket
-						if(Token_Map[TokPos].Type.compare("INI_ENDBRACKET") == 0) { uEndBracket++; break; }
-
-						//everything should be a number here now? but we'll check just in case
-						if(isNumber(Token_Map[TokPos].Value) == false) { 
-							cout << Token_Map[TokPos].Value << " is not a number!\n";
-						} else {
-							uint ProvPos = findProvID(Welt, stoi(Token_Map[TokPos].Value));
-							ProvFS[ProvPos].szContinent = szFileContinent;
-						}
-					}
-				} else {
-					cout << "Unknown: " << Token_Map[TokPos].Value << endl;
-				}
-
+			for(; uPos < TokMap.size(); uPos++) {
+				if(TokMap[uPos].itKeyNameType == INI_OPENBRACKET || TokMap[uPos].itKeyValueType == INI_OPENBRACKET) { uOpenBracket++; }
+				if(TokMap[uPos].itKeyNameType == INI_ENDBRACKET || TokMap[uPos].itKeyValueType == INI_ENDBRACKET) { uEndBracket++; }
+				
 				if(uEndBracket == uOpenBracket) {
-					break;
+					//cout << uEndBracket << " == " << uOpenBracket << endl;
+					RanSetup.uEnd = uPos;
+					return RanSetup;
 				}
 			}
 		}
 	}
 
-
-	return ProvFS;
+	// We shouldnt get here
+	RanSetup.uEnd = 0;
+	RanSetup.uStart = 0;
+	return RanSetup;
 }
-*/
+
+
+
+bool bCheckIfNumber(std::string_view szLine) {
+	for(uint i = 0; i < szLine.length(); i++) {
+		if(isdigit(szLine[i]) == true) {
+			return true;
+		}
+	}
+	return false;
+}
+
+
+
+vector<string> szGiveListOfPops() {
+	vector<string> vecFileList = listingOfFolder("game/poptypes/", false);
+
+	for(uint i = 0; i < vecFileList.size(); i++) {
+		vecFileList[i] = vecFileList[i].substr(0, vecFileList[i].find_first_of("."));
+	}
+
+	return vecFileList;
+}
+
+
+
+bool bIsStrPop(std::string_view szLine, vector<string> &PopTypes) {
+	for(uint uPos = 0; uPos < PopTypes.size(); uPos++) {
+		if(PopTypes[uPos].compare(szLine) == 0) {
+			return true;
+		}
+	}
+	return false;
+}
+
+
+
+vector<Province> populateProvinceWPops(vector<string> &PopTypes) {
+	vector<Province> Welt;
+	vector<string> vecFolderList = listingOfFolder("game/history/pops/1836.1.1/", true);
+	vector<Token> TokMap;
+
+	// Start reading one of the files
+	for(uint uFLPos = 0; uFLPos < vecFolderList.size(); uFLPos++) {
+		TokMap = mapReadIniFile(vecFolderList[uFLPos]);
+		// Start reading the current files tokmap
+		for(uint uPos = 0; uPos < TokMap.size(); uPos++) {
+			// Check if weve reached a section 
+			if(TokMap[uPos].itKeyNameType == INI_SECTION) {
+				struct SectionRange RanSetup = srGiveSectionRange(TokMap, TokMap[uPos].szKeyName);
+				Province ProvSetup;
+				ProvSetup.uID = stoi(RanSetup.szSection);
+				// start reading through section
+				for(uPos++; uPos < RanSetup.uEnd; uPos++) {
+					if(bIsStrPop(TokMap[uPos].szKeyName, PopTypes) == true) {
+						Pop PopSetup;
+						PopSetup.szType = TokMap[uPos].szKeyName;
+						// Start reading through Pop
+						for(; uPos < RanSetup.uEnd; uPos++) {
+							if(TokMap[uPos].itKeyNameType == INI_ENDBRACKET || TokMap[uPos].itKeyValueType == INI_ENDBRACKET) {
+								//cout << "Huzzah!\n";
+								break;
+							}
+
+							if(TokMap[uPos].itKeyNameType == INI_KEYNAME) {
+								if(TokMap[uPos].szKeyName.compare("culture") == 0) {
+									PopSetup.szCulture = TokMap[uPos].szKeyValue;				// TODO: Change this to a position marker in a vector of cultures, storing a string each time is awful
+								} else
+								if(TokMap[uPos].szKeyName.compare("religion") == 0) {
+									PopSetup.szReligion = TokMap[uPos].szKeyValue;				// TODO: Change this to a position marker in a vector of Religions, storing a string each time is awful
+								} else
+								if(TokMap[uPos].szKeyName.compare("size") == 0) {
+									PopSetup.uSize = stoi(TokMap[uPos].szKeyValue);
+								} else
+								if(TokMap[uPos].szKeyName.compare("militancy") == 0) {
+									PopSetup.fMilitancy = stof(TokMap[uPos].szKeyValue);
+								} else
+								if(TokMap[uPos].szKeyName.compare("rebel_type") == 0) {
+									PopSetup.szRebelType = TokMap[uPos].szKeyValue;
+								}
+								else {
+									cout << "Unknown Variable in " << RanSetup.szSection << " : " << TokMap[uPos].szKeyName << endl;
+								}
+							}
+						}
+						ProvSetup.Populations.push_back(PopSetup);
+					} else {
+						if(bCheckIfNumber(TokMap[uPos].szKeyName) == true) {
+							//cout << "breaking...\n";
+							break;
+						} else {
+							cout << TokMap[uPos].szKeyName << " is not PopType!\n";
+						}
+					}
+				}
+				Welt.push_back(ProvSetup);
+			}
+		}
+	}
+
+	return Welt;
+}
+
+
+
+vector<Province> populateProvinceWAttrib() {
+	vector<string> szFolderList = listingOfFolder("game/history/provinces/", true);
+}
+
+
+
+
 
 
 

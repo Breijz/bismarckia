@@ -27,13 +27,13 @@ using namespace std;
 
 
 // TODO: this needs to be improved upon.
-string szStripTabs(string szLine) {
+string szStripTabs(string &szLine) {
     string Ans;
 	for(int i = 0; i < szLine.size(); i++) {
 	    if(szLine[i] != '\t' && szLine[i] != ' ' && szLine[i] != '\r') {
 	        Ans.push_back(szLine[i]);
 	    } else if(szLine[i] == ' ') {
-		    if(isdigit(szLine[i-2]) == true && isdigit(szLine[i+2]) == true) {
+		    if(isdigit(szLine[i-1]) == true && isdigit(szLine[i+1]) == true) {
 			    Ans.push_back(',');
 		    }
 	    }
@@ -102,18 +102,12 @@ vector<Token> mapReadIniFile(string szFile) {
 	Readfile.open(szFile);
 
 	while(getline(Readfile, szLine)) {
-		//szLine = szStripSpace(szLine);
-		//szLine = szStripTabs(szLine);
-		if(szLine[0] != '#' && szLine.empty() == false) {
+		if(szLine[0] != ' ' && szLine[0] != '#') {
 			szLine = szStripTabs(szLine);
 			szLine = szStripComments(szLine);
-			vector<string> temp = vecSeperateAtCR(szLine);
-			for(uint i = 0; i < temp.size(); i++) {
-				szLine = temp[i];
-				//szLine = szStripComments(szLine);
-				if(szLine.empty() == false) {
-					szFileLines.push_back(szLine);
-				}
+			vector<string> Temp = vecSeperateAtCR(szLine);
+			for(uint i = 0; i < Temp.size(); i++) {
+				szFileLines.push_back(Temp[i]);
 			}
 		}
 	}

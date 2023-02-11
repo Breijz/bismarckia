@@ -11,9 +11,8 @@
 
 
 
-std::vector<Province> populateProvinceWPops();
+std::vector<std::string> szGiveListOfPops();
 
-std::vector<Province> populateProvinceWAttrib(std::vector<Province> ProvWPop, char* File);
+bool bIsStrPop(std::string_view szLine, std::vector<std::string> &PopTypes);
 
-std::vector<Province> orgProvIntoContinents(std::vector<Province> Welt);
-
+std::vector<Province> populateProvinceWPops(std::vector<std::string> &PopTypes);

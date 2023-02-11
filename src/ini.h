@@ -29,6 +29,12 @@ struct Token {
 	std::string szKeyValue;
 };
 
+struct SectionRange {
+	std::string szSection;
+	uint uStart;
+	uint uEnd;
+};
+
 //void szStripTabs(std::string_view szLine);
 
 //void szStripComments(std::string_view szLine);

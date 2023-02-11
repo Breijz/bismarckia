@@ -10,16 +10,18 @@
 using namespace std;
 
 int main() {
-	vector<Token> vecToken = mapReadIniFile("game/common/goods.txt");
-
-	vector<Province> Welt = populateProvinceWPops();
+	//vector<Token> vecToken = mapReadIniFile("game/common/goods.txt");
 	
-	for(uint i = 0; i < vecToken.size(); i++) {
-		if(vecToken[i].itKeyNameType == 2) {
-			cout << vecToken[i].szKeyName << "| = |" << vecToken[i].szKeyValue << endl;
+	vector<string> PopTypes = szGiveListOfPops();
+
+
+	vector<Province> Welt = populateProvinceWPops(PopTypes);
+
+	for(uint x = 0; x < Welt.size(); x++) {
+		if(Welt[x].uID > 2702) {
+			cout << Welt[x].uID << endl;
 		}
 	}
-
 
 	return 0;
 }
