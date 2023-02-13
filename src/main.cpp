@@ -11,11 +11,11 @@
 using namespace std;
 
 int main() {
+	vector<Good> Laden = SetupGoods();
 
-	vector<Good> GoodList = SetupGoods();
-
-	for(uint i = 0; i < GoodList.size(); i++) {
-		cout << GoodList[i].fCost << endl;
+	for(int i = 0; i < Laden.size(); i++) {
+		cout << Laden[i].szName << " = " << "{" << (uint)Laden[i].Colour.R << "," << (uint)Laden[i].Colour.G << "," << (uint)Laden[i].Colour.B << "}" << endl;
+		cout << endl;
 	}
 
 	return 0;
@@ -24,6 +24,9 @@ int main() {
 
 	vector<Province> Welt = populateProvinceWPops(PopTypes);
 
+	orgIntoState(Welt);
+
+	return 0;
 
 	populateProvinceWAttrib(Welt);
 	

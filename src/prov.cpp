@@ -7,6 +7,7 @@
 #include "factory.h"
 #include "ini.h"
 #include "filelisting.h"
+#include "state.hpp"
 
 #include "prov.h"
 
@@ -14,12 +15,12 @@ using namespace std;
 
 
 
-SectionRange srGiveSectionRange(vector<Token> const& TokMap, std::string_view szLine) {
+SectionRange srGiveSectionRange(vector<Token> const& TokMap, std::string_view szLine, uint uPos) {
 	struct SectionRange RanSetup;
 	RanSetup.szSection = szLine;
 	
 	// Begin reading through the vector
-	for(uint uPos = 0; uPos < TokMap.size(); uPos++) {
+	for(; uPos < TokMap.size(); uPos++) {
 		if(TokMap[uPos].szKeyName.compare(szLine) == 0 && TokMap[uPos].itKeyNameType == INI_SECTION) {
 			RanSetup.uStart = uPos;
 			//Begin reading through the Section
@@ -124,7 +125,7 @@ vector<Province> populateProvinceWPops(vector<string> &PopTypes) {
 		for(uint uPos = 0; uPos < TokMap.size(); uPos++) {
 			// Check if weve reached a section 
 			if(TokMap[uPos].itKeyNameType == INI_SECTION) {
-				struct SectionRange RanSetup = srGiveSectionRange(TokMap, TokMap[uPos].szKeyName);
+				struct SectionRange RanSetup = srGiveSectionRange(TokMap, TokMap[uPos].szKeyName, 0);
 				Province ProvSetup;
 				ProvSetup.uID = stoi(RanSetup.szSection);
 				// start reading through section
@@ -280,6 +281,27 @@ vector<Province> populateProvinceWAttrib(vector<Province> &Welt) {
 	return Welt;
 }
 
+
+
+vector<State> orgIntoState(vector<Province> Welt) {
+	vector<Token> TokMap = mapReadIniFile("game/map/region.txt");
+	vector<State> Staten;
+	for(uint uTokPos = 0; uTokPos < TokMap.size(); uTokPos++) {
+		if(TokMap[uTokPos].itKeyNameType == INI_KEYNAME) {
+			string test = TokMap[uTokPos].szKeyName.substr((TokMap[uTokPos].szKeyName.find_first_of("_") + 1), (TokMap[uTokPos].szKeyName.find_first_of("=") - 1));
+			//cout << test << endl;
+			uint uStateID = stoi(test);
+			cout << uStateID << endl;
+			string tList = TokMap[uTokPos].szKeyValue.substr(1, TokMap[uTokPos].szKeyValue.length());
+			vector<string> ProvIDs = vecSeperateAtChar(tList, ',');
+			for(int i = 0; i < ProvIDs.size(); i++) {
+				cout << "\t" << ProvIDs[i] << endl;
+			}
+		}
+	}
+
+	return Staten;
+}
 
 
 

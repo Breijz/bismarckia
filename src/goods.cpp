@@ -18,7 +18,7 @@ vector<Good> SetupGoods() {
 	vector<SectionRange> szSectionList = spListGrandSections(TokMap);
 	
 	for(uint i = 0; i < szSectionList.size(); i++) {
-		struct SectionRange srRange = srGiveSectionRange(TokMap, szSectionList[i].szSection);
+		struct SectionRange srRange = srGiveSectionRange(TokMap, szSectionList[i].szSection, 0);
 		//cout << "Reading " << szSectionList[i].szSection << endl;
 		for(uint uTokPos = (srRange.uStart + 1); uTokPos != srRange.uEnd; uTokPos++) {
 			if(TokMap[uTokPos].itKeyNameType == INI_SECTION) {
@@ -33,7 +33,17 @@ vector<Good> SetupGoods() {
 							GoodSetup.fCost = stof(TokMap[uTokPos].szKeyValue);
 						} else
 						if(TokMap[uTokPos].szKeyName.compare("color") == 0) {
-							GoodSetup.Colour.R = stoi(TokMap[uTokPos].szKeyValue.substr(1, (TokMap[uTokPos].szKeyValue.find_first_of(",") - 1)));
+							uint uLeftComma = 0;
+							uint uRightComma = 0;
+							uLeftComma = TokMap[uTokPos].szKeyValue.find(",");
+							uRightComma = TokMap[uTokPos].szKeyValue.find(",", (uLeftComma + 1));
+
+							GoodSetup.Colour.R = stoi(TokMap[uTokPos].szKeyValue.substr(1, (uLeftComma - 1)));
+							//cout << TokMap[uTokPos].szKeyValue.substr((uLeftComma + 1),(uRightComma - 1)) << endl;
+							GoodSetup.Colour.G = stoi(TokMap[uTokPos].szKeyValue.substr((uLeftComma + 1), (uRightComma - 1)));
+
+							GoodSetup.Colour.B = stoi(TokMap[uTokPos].szKeyValue.substr((uRightComma + 1), TokMap[uTokPos].szKeyValue.length()));
+
 							//cout << "|" << TokMap[uTokPos].szKeyValue << "|" << endl;
 						} else
 						if(TokMap[uTokPos].szKeyName.compare("available_from_start") == 0) {

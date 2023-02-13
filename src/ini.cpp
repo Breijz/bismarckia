@@ -77,12 +77,12 @@ string szStripSpace(string &szLine) {
 
 
 
-vector<string> vecSeperateAtCR(string &szLine) {
+vector<string> vecSeperateAtChar(string &szLine, char cDelim) {
 	vector<string> sepLines;
 	string finLine;
 	size_t pos;
 
-	while((pos = szLine.find("\r")) != string::npos) {
+	while((pos = szLine.find(cDelim)) != string::npos) {
 		sepLines.push_back(szLine.substr(0, pos));
 		szLine.erase(0, (pos+1));
 	}
@@ -105,7 +105,7 @@ vector<Token> mapReadIniFile(string szFile) {
 		if(szLine[0] != ' ' && szLine[0] != '#') {
 			szLine = szStripTabs(szLine);
 			szLine = szStripComments(szLine);
-			vector<string> Temp = vecSeperateAtCR(szLine);
+			vector<string> Temp = vecSeperateAtChar(szLine, '\r');
 			for(uint i = 0; i < Temp.size(); i++) {
 				szFileLines.push_back(Temp[i]);
 			}
@@ -164,7 +164,8 @@ vector<Token> mapReadIniFile(string szFile) {
 				TokSetup.szKeyName = szKeyName;
 				if(szKeyValue.find("{") != string::npos && szKeyValue.find("}") != string::npos) {
 					TokSetup.itKeyValueType = INI_CAPSULE;
-					TokSetup.szKeyValue = szKeyValue;
+					//TokSetup.szKeyValue = szKeyValue;
+					TokSetup.szKeyValue = szKeyValue.substr(szKeyValue.find_first_of("{") , szKeyValue.find_last_of("}"));
 				} else {
 					TokSetup.itKeyValueType = INI_KEYVALUE;
 					TokSetup.szKeyValue = szKeyValue;

@@ -9,9 +9,15 @@
 using namespace std;
 
 struct Farbe {
-	char R;
-	char G;
-	char B;
+	unsigned char R;
+	unsigned char G;
+	unsigned char B;
+	// NOTE: uchar is 8 bits whereas uint is 16, differance is that uchar needs to be casted into (uint) to be displayed correctly.
+	// Vic2s files only use values from 0-255, so uchar is better, as it only supports values from 0-256, hence uint would be overkill
+	// as itd allow for values from 0-65536, which is never seen in the files, or expected to be supported afaik. -Breizh
+	//uint R;
+	//uint G;
+	//uint B;
 };
 
 struct Good {

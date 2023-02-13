@@ -39,7 +39,7 @@ struct SectionRange {
 
 //void szStripComments(std::string_view szLine);
 
-std::vector<std::string> vecSeperateAtCR(std::string &szLine);
+std::vector<std::string> vecSeperateAtChar(std::string &szLine, char cDelim);
 
 std::string szCleanString(std::string &szLine);
 
