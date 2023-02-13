@@ -283,20 +283,36 @@ vector<Province> populateProvinceWAttrib(vector<Province> &Welt) {
 
 
 
-vector<State> orgIntoState(vector<Province> Welt) {
+// TODO/NOTE: This code _doesnt_ create new states for divided states (z.B. where one country controls ProvIDs 1 and 2 and another ProvIDs 3, 4 and 5, of a state which would have ProvIDs, 1, 2, 3, 4 and 5
+vector<State> orgIntoState(vector<Province> const& Welt) {
 	vector<Token> TokMap = mapReadIniFile("game/map/region.txt");
 	vector<State> Staten;
 	for(uint uTokPos = 0; uTokPos < TokMap.size(); uTokPos++) {
 		if(TokMap[uTokPos].itKeyNameType == INI_KEYNAME) {
+			State Staat;
 			string test = TokMap[uTokPos].szKeyName.substr((TokMap[uTokPos].szKeyName.find_first_of("_") + 1), (TokMap[uTokPos].szKeyName.find_first_of("=") - 1));
 			//cout << test << endl;
-			uint uStateID = stoi(test);
-			cout << uStateID << endl;
+			Staat.uStateID = stoi(test);
 			string tList = TokMap[uTokPos].szKeyValue.substr(1, TokMap[uTokPos].szKeyValue.length());
 			vector<string> ProvIDs = vecSeperateAtChar(tList, ',');
+			struct i_StateProvPos sppBundle;
 			for(int i = 0; i < ProvIDs.size(); i++) {
-				cout << "\t" << ProvIDs[i] << endl;
+				sppBundle.uProvID = stoi(ProvIDs[i]);
+				bool bFoundID = false;
+				for(int x = 0; x < Welt.size(); x++) {
+					if(Welt[x].uID == sppBundle.uProvID) {
+						sppBundle.uProvPos = x;
+						bFoundID = true;
+						Staat.Provinces.push_back(sppBundle);
+						break;
+					}
+				}
+				if(bFoundID == false) {
+					cout << "prov.cpp :: orgIntoState : Province ID: " << sppBundle.uProvID << " not found!\n";
+				}
 			}
+			Staten.push_back(Staat);
+
 		}
 	}
 

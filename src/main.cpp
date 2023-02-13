@@ -11,20 +11,20 @@
 using namespace std;
 
 int main() {
-	vector<Good> Laden = SetupGoods();
-
-	for(int i = 0; i < Laden.size(); i++) {
-		cout << Laden[i].szName << " = " << "{" << (uint)Laden[i].Colour.R << "," << (uint)Laden[i].Colour.G << "," << (uint)Laden[i].Colour.B << "}" << endl;
-		cout << endl;
-	}
-
-	return 0;
 	vector<string> PopTypes = szGiveListOfPops();
 
 
 	vector<Province> Welt = populateProvinceWPops(PopTypes);
 
-	orgIntoState(Welt);
+	vector<State> Staten = orgIntoState(Welt);
+
+	for(int i = 0; i < Staten.size(); i++) {
+		cout << Staten[i].uStateID << endl;
+		for(int x = 0; x < Staten[i].Provinces.size(); x++) {
+			cout << "\t" << Staten[i].Provinces[x].uProvID << endl;
+		}
+	}
+
 
 	return 0;
 

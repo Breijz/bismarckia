@@ -11,5 +11,6 @@ struct i_StateProvPos {
 
 class State {
 	public:
+		uint uStateID = 0;
 		std::vector<i_StateProvPos> Provinces;
 };

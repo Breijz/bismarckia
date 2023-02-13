@@ -26,4 +26,4 @@ std::vector<Province> populateProvinceWPops(std::vector<std::string> &PopTypes);
 
 std::vector<Province> populateProvinceWAttrib(std::vector<Province> &Welt);
 
-std::vector<State> orgIntoState(std::vector<Province> Welt);
+std::vector<State> orgIntoState(std::vector<Province> const& Welt);
