@@ -38,9 +38,9 @@ struct SectionRange {
 //void szStripTabs(std::string_view szLine);
 
 //void szStripComments(std::string_view szLine);
-
+//
 std::vector<std::string> vecSeperateAtChar(std::string &szLine, char cDelim);
 
-std::string szCleanString(std::string &szLine);
+std::string cleanString(std::string &szLine);
 
-std::vector<Token> mapReadIniFile(std::string szFile);
+std::vector<Token> tokeniseIniFile(std::string szFile);

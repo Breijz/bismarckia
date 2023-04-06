@@ -5,9 +5,15 @@
 
 
 
-class Factory {
+/*class Factory {
 	public:
 		uint uLevel = 0;
 		std::string szBuilding;
 		bool bUpgrade = false;
+};*/
+
+struct Factory {
+	uint uLevel = 0;
+	std::string szBuilding;
+	bool bUpgrade = false;
 };

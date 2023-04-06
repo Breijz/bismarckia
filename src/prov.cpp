@@ -1,6 +1,8 @@
 #include <iostream>
 #include <string>
 #include <vector>
+#include <regex>
+#include <unistd.h>
 
 #include "pop.h"
 #include "province.h"
@@ -14,6 +16,14 @@
 using namespace std;
 
 
+
+void sanitiseString(string &szLine) {
+	for(uint i = 0; i < szLine.size(); i++) {
+		if(szLine[i] == '\n' || szLine[i] == '\r') {
+			szLine.erase(i,1);
+		}
+	}
+}
 
 SectionRange srGiveSectionRange(vector<Token> const& TokMap, std::string_view szLine, uint uPos) {
 	struct SectionRange RanSetup;
@@ -120,13 +130,14 @@ vector<Province> populateProvinceWPops(vector<string> &PopTypes) {
 
 	// Start reading one of the files
 	for(uint uFLPos = 0; uFLPos < vecFolderList.size(); uFLPos++) {
-		TokMap = mapReadIniFile(vecFolderList[uFLPos]);
+		TokMap = tokeniseIniFile(vecFolderList[uFLPos]);
 		// Start reading the current files tokmap
 		for(uint uPos = 0; uPos < TokMap.size(); uPos++) {
 			// Check if weve reached a section 
-			if(TokMap[uPos].itKeyNameType == INI_SECTION) {
+			if(TokMap[uPos].itKeyNameType == INI_SECTION && bCheckIfNumber(TokMap[uPos].szKeyName) != false) {
 				struct SectionRange RanSetup = srGiveSectionRange(TokMap, TokMap[uPos].szKeyName, 0);
 				Province ProvSetup;
+				//cout << RanSetup.szSection << endl;
 				ProvSetup.uID = stoi(RanSetup.szSection);
 				// start reading through section
 				for(uPos++; uPos < RanSetup.uEnd; uPos++) {
@@ -204,17 +215,25 @@ vector<Province> populateProvinceWAttrib(vector<Province> &Welt) {
 				cout << uProvID << " Not Found!\n";
 			}
 
-			vector<Token> TokMap = mapReadIniFile(szFileList[uFLPos]);
+			vector<Token> TokMap = tokeniseIniFile(szFileList[uFLPos]);
 			for(uint uTokPos = 0; uTokPos < TokMap.size(); uTokPos++) {
 				if(TokMap[uTokPos].itKeyNameType == INI_KEYNAME) {
+					sanitiseString(TokMap[uTokPos].szKeyValue);
 
 					if(TokMap[uTokPos].szKeyName.compare("trade_goods") == 0) {
+						sanitiseString(TokMap[uTokPos].szKeyValue);
 						Welt[uProvPos].szGood = TokMap[uTokPos].szKeyValue;
 					} else
 					if(TokMap[uTokPos].szKeyName.compare("life_rating") == 0) {
-						Welt[uProvPos].uLiferating = stoi(TokMap[uTokPos].szKeyValue);
+						if(bCheckIfNumber(TokMap[uTokPos].szKeyValue) == true) {
+							Welt[uProvPos].uLiferating = stoi(TokMap[uTokPos].szKeyValue);
+						} else {
+							cout << "stoi() Error: " << TokMap[uTokPos].szKeyValue << endl;
+							sleep(5);
+						}
 					} else
 					if(TokMap[uTokPos].szKeyName.compare("owner") == 0) {
+						cout << "prov.cpp - szOwner: " << TokMap[uTokPos].szKeyValue << endl;
 						Welt[uProvPos].szOwner = TokMap[uTokPos].szKeyValue;
 					} else
 					if(TokMap[uTokPos].szKeyName.compare("add_core") == 0) {
@@ -239,13 +258,28 @@ vector<Province> populateProvinceWAttrib(vector<Province> &Welt) {
 						
 					} else
 					if(TokMap[uTokPos].szKeyName.compare("fort") == 0) {
-						Welt[uProvPos].uFort = stoi(TokMap[uTokPos].szKeyValue);
+						if(bCheckIfNumber(TokMap[uTokPos].szKeyValue) == true) {
+							Welt[uProvPos].uFort = stoi(TokMap[uTokPos].szKeyValue);
+						} else {
+							cout << "stoi() Error: " << TokMap[uTokPos].szKeyValue << endl;
+							sleep(5);
+						}
 					} else
 					if(TokMap[uTokPos].szKeyName.compare("railroad") == 0) {
-						Welt[uProvPos].uRailroad = stoi(TokMap[uTokPos].szKeyValue);
+						if(bCheckIfNumber(TokMap[uTokPos].szKeyValue) == true) {
+							Welt[uProvPos].uRailroad = stoi(TokMap[uTokPos].szKeyValue);
+						} else {
+							cout << "stoi() Error: " << TokMap[uTokPos].szKeyValue << endl;
+							sleep(5);
+						}
 					} else
 					if(TokMap[uTokPos].szKeyName.compare("naval_base") == 0) {
-						Welt[uProvPos].uNavalBase = stoi(TokMap[uTokPos].szKeyValue);
+						if(bCheckIfNumber(TokMap[uTokPos].szKeyValue) == true) {
+							Welt[uProvPos].uNavalBase = stoi(TokMap[uTokPos].szKeyValue);
+						} else {
+							cout << "stoi() Error: " << TokMap[uTokPos].szKeyValue << endl;
+							sleep(5);
+						}
 					} else
 					if(TokMap[uTokPos].szKeyName.compare("colonial") == 0) {
 						if(TokMap[uTokPos].szKeyValue.compare("yes") == 0) {
@@ -258,18 +292,57 @@ vector<Province> populateProvinceWAttrib(vector<Province> &Welt) {
 						Welt[uProvPos].szTerrain = TokMap[uTokPos].szKeyValue;
 					}
 					else {
-						cout << "Error in " << Welt[uProvPos].uID << " : " << TokMap[uTokPos].szKeyName << " : " << TokMap[uTokPos].szKeyValue << endl;
+						if(TokMap[uTokPos].szKeyName.compare("state_building") == 0) {
+							cout << "State Building Found in main sequence\n";
+						}
+						//cout << "Error in " << Welt[uProvPos].uID << " : " << TokMap[uTokPos].szKeyName << " : " << TokMap[uTokPos].szKeyValue << endl;
+						//cout << "Types : " << TokMap[uTokPos].itKeyNameType << " : " << TokMap[uTokPos].itKeyValueType << endl;
 					}
 
 				} else if(TokMap[uTokPos].itKeyNameType == INI_SECTION) {
-					if(TokMap[uTokPos].szKeyName.compare("state_building") == 0) {
-						for(; uTokPos < TokMap.size(); uTokPos++) {													// TODO : Implement
-							if(TokMap[uTokPos].itKeyNameType == INI_ENDBRACKET || TokMap[uTokPos].itKeyValueType == INI_ENDBRACKET) { break; }
+					sanitiseString(TokMap[uTokPos].szKeyValue);
+					if(regex_match(TokMap[uTokPos].szKeyName, regex("^(?:[0-9]{4}[.][0-9]{1,2}[.][0-9]{1,2}[=][{]$)")) == true) {
+						// TODO: Implement historical bookmarks
+						for(; uTokPos < TokMap.size(); uTokPos++) {
+							uint uOB = 0;
+							uint uEB = 0;
+							if(TokMap[uTokPos].itKeyNameType == INI_OPENBRACKET || TokMap[uTokPos].itKeyValueType == INI_OPENBRACKET) {
+								uOB++;
+							}
+							if(TokMap[uTokPos].itKeyNameType == INI_ENDBRACKET || TokMap[uTokPos].itKeyValueType == INI_ENDBRACKET) {
+								uEB++;
+							}
+							if(uOB == uEB) {
+								break;
+							}
 						}
-					} else
-					if(TokMap[uTokPos].szKeyName.compare("revolt") == 0) {
-						for(; uTokPos < TokMap.size(); uTokPos++) {													// TODO : Implement
-							if(TokMap[uTokPos].itKeyNameType == INI_ENDBRACKET || TokMap[uTokPos].itKeyValueType == INI_ENDBRACKET) { break; }
+					} else {
+						if(TokMap[uTokPos].szKeyName.compare("state_building") == 0) {
+							struct Factory FactSetup;
+							for(; uTokPos < TokMap.size(); uTokPos++) {													// TODO : Implement
+									if(TokMap[uTokPos].szKeyName.compare("level") == 0) {
+										FactSetup.uLevel = stoi(TokMap[uTokPos].szKeyValue);
+									}else
+									if(TokMap[uTokPos].szKeyName.compare("building") == 0) {
+										FactSetup.szBuilding = TokMap[uTokPos].szKeyValue;
+									} else
+									if(TokMap[uTokPos].szKeyName.compare("upgrade") == 0) {
+										if(TokMap[uTokPos].szKeyValue.compare("yes") == 0) {
+											FactSetup.bUpgrade = true;
+										} else {
+											FactSetup.bUpgrade = false;
+										}
+									}
+								if(TokMap[uTokPos].itKeyNameType == INI_ENDBRACKET || TokMap[uTokPos].itKeyValueType == INI_ENDBRACKET) { 
+									Welt[uProvPos].Factories.push_back(FactSetup);
+									break; 
+								}
+							}
+						} else
+						if(TokMap[uTokPos].szKeyName.compare("revolt") == 0) {
+							for(; uTokPos < TokMap.size(); uTokPos++) {													// TODO : Implement
+								if(TokMap[uTokPos].itKeyNameType == INI_ENDBRACKET || TokMap[uTokPos].itKeyValueType == INI_ENDBRACKET) { break; }
+							}
 						}
 					}
 				}
@@ -285,18 +358,19 @@ vector<Province> populateProvinceWAttrib(vector<Province> &Welt) {
 
 // TODO/NOTE: This code _doesnt_ create new states for divided states (z.B. where one country controls ProvIDs 1 and 2 and another ProvIDs 3, 4 and 5, of a state which would have ProvIDs, 1, 2, 3, 4 and 5
 vector<State> orgIntoState(vector<Province> const& Welt) {
-	vector<Token> TokMap = mapReadIniFile("game/map/region.txt");
+	vector<Token> TokMap = tokeniseIniFile("game/map/region.txt");
 	vector<State> Staten;
 	for(uint uTokPos = 0; uTokPos < TokMap.size(); uTokPos++) {
 		if(TokMap[uTokPos].itKeyNameType == INI_KEYNAME) {
 			State Staat;
 			string test = TokMap[uTokPos].szKeyName.substr((TokMap[uTokPos].szKeyName.find_first_of("_") + 1), (TokMap[uTokPos].szKeyName.find_first_of("=") - 1));
-			//cout << test << endl;
+			cout << "orgIntoState 1: " << test << endl;
 			Staat.uStateID = stoi(test);
 			string tList = TokMap[uTokPos].szKeyValue.substr(1, TokMap[uTokPos].szKeyValue.length());
 			vector<string> ProvIDs = vecSeperateAtChar(tList, ',');
 			struct i_StateProvPos sppBundle;
 			for(int i = 0; i < ProvIDs.size(); i++) {
+				cout << "orgIntoState 2: " << ProvIDs[i] << endl;
 				sppBundle.uProvID = stoi(ProvIDs[i]);
 				bool bFoundID = false;
 				for(int x = 0; x < Welt.size(); x++) {

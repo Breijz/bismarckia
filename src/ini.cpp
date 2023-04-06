@@ -1,81 +1,24 @@
-#include "ini.h"
-
 #include <iostream>
 #include <fstream>
 #include <string>
+#include <regex>
 #include <vector>
-#include <map>
+
+#include "ini.h"
 
 using namespace std;
 
 
 
-/*enum IniTypes {
-	INI_KEYNAME,
-	INI_KEYVALUE,
-	INI_ENDBRACKET,
-	INI_OPENBRACKET,
-	INI_CAPSULE		// This is for when keyname = { 0 0 0 }, like for RGB values or for the map/region.txt file -breizh
-};*/
-
-
-
-/*string szStripTabs(string &szLine) {
-	return szLine.substr((1 + szLine.find_last_of("\t")), szLine.length());
+/*string alphaNurString(string &szLine) {
+	string szCleaned;
+	for(uint i = 0; i < szLine.size(); i++) {
+		if(isalpha(szLine[i]) == true) {
+			szCleaned.push_back(szLine[i]);
+		}
+	}
+	return szCleaned;
 }*/
-
-
-
-// TODO: this needs to be improved upon.
-string szStripTabs(string &szLine) {
-    string Ans;
-	for(int i = 0; i < szLine.size(); i++) {
-	    if(szLine[i] != '\t' && szLine[i] != ' ' && szLine[i] != '\r') {
-	        Ans.push_back(szLine[i]);
-	    } else if(szLine[i] == ' ') {
-		    if(isdigit(szLine[i-1]) == true && isdigit(szLine[i+1]) == true) {
-			    Ans.push_back(',');
-		    }
-	    }
-	}
-    
-    return Ans;
-}
-
-
-
-string szStripComments(string &szLine) {
-	uint uPos = szLine.find_first_of("#");
-	if(uPos != string::npos || uPos > szLine.length()) {
-		return szLine.substr(0, uPos);
-	} else {
-		return szLine;
-	}
-}
-
-
-
-string szStripSpace(string &szLine) {
-	string Ans;
-	for(uint uPos = 0; uPos < szLine.length(); uPos++) {
-		if(szLine[uPos] == '{') {
-			for(; uPos < szLine.length(); uPos++) {
-				Ans.push_back(szLine[uPos]);
-				if(szLine[uPos] == '}') {
-					uPos++;
-					break;
-				}
-			}
-		}
-		if(szLine[uPos] != ' ' && szLine[uPos] != '\t') {
-			Ans.push_back(szLine[uPos]);
-		}
-	}
-	return Ans;
-}
-
-
-
 
 vector<string> vecSeperateAtChar(string &szLine, char cDelim) {
 	vector<string> sepLines;
@@ -91,112 +34,115 @@ vector<string> vecSeperateAtChar(string &szLine, char cDelim) {
 	return sepLines;
 }
 
+string cleanString(string &szLine) {
+	bool bCapsule = false;
+	//check if were dealing with a capsule
+	if(regex_search(szLine, regex("(?:[{].*[}])")) == true) {
+		bCapsule = true;	
+	}
+	string szCleaned;
+	for(uint i = 0; i < szLine.size(); i++) {
+		if(szLine[i] != ' ' && szLine[i] != '#' && szLine[i] != '\t') {
+			if(bCapsule == true && szLine[i] == '{') { break; }
+			if(szLine[i] == '\r' && szLine[i+1] != '\n') {
+				szCleaned.push_back('\n');
+				i=i+2;
+			} else if(szLine[i] == '\r' && szLine[i+1] == '\n') {
+				szCleaned.push_back('\n');
+				i=i+3;
+			} else if(szLine[i] == '\r' && szLine[i+1] == '\r') {
+				szCleaned.push_back('\n');
+				i=i+3;
+			} 
+			/*if(szLine[i] == '\r') {
+				szCleaned.push_back('\n');
+			}*/ else {
+				szCleaned.push_back(szLine[i]);
+			}
+		} else if(szLine[i] == '#') { break; }
+	}
+	return szCleaned;
+}
 
-
-vector<Token> mapReadIniFile(string szFile) {
-	vector<Token> vecToken;
+vector<Token> tokeniseIniFile(string szFile) {
+	vector<Token> TokMap;
 	vector<string> szFileLines;
-	string szLine;
 	ifstream Readfile;
-
+	string szLine;
 	Readfile.open(szFile);
 
-	while(getline(Readfile, szLine)) {
-		if(szLine[0] != ' ' && szLine[0] != '#') {
-			szLine = szStripTabs(szLine);
-			szLine = szStripComments(szLine);
-			vector<string> Temp = vecSeperateAtChar(szLine, '\r');
+	while(getline(Readfile,szLine)) {
+		szLine = cleanString(szLine);
+		if(szLine.find_first_of('\n') != szLine.length()) {
+			vector<string> Temp = vecSeperateAtChar(szLine, '\n');
 			for(uint i = 0; i < Temp.size(); i++) {
+				//cout << "Seperated " << i << " : " << Temp[i] << endl;
+				//if(Temp[i][Temp[i].size()] == '\n' && Temp[i][Temp[i].size() -1] == '\n') { cout << "test\n"; }
+				//szFileLines.push_back(alphaNurString(Temp[i]));
 				szFileLines.push_back(Temp[i]);
 			}
+		} else {
+			szFileLines.push_back(szLine);
 		}
 	}
 	Readfile.close();
-	
-	for(uint uVecPos = 0; uVecPos < szFileLines.size(); uVecPos++) {
-		uint uDelimPos = szFileLines[uVecPos].find("=");	
-		//cout << "File: " << szFileLines[uVecPos] << endl;
 
-
-		/*
-		 * Will trigger for these lines
-		 * {
-		 * ...
-		 * }
-		 */
-		if(uDelimPos == string::npos || uDelimPos > szFileLines[uVecPos].size()) {
-			if(szFileLines[uVecPos].find("{") != string::npos) {
-				struct Token TokSetup;
-				TokSetup.itKeyNameType = INI_OPENBRACKET;
-				TokSetup.itKeyValueType = INI_EMPTY;
-				TokSetup.szKeyName = "{";
-				vecToken.push_back(TokSetup);
-			} else if(szFileLines[uVecPos].find("}") != string::npos) {
-				struct Token TokSetup;
+	for(uint uPos = 0; uPos < szFileLines.size(); uPos++) {
+		if(szFileLines[uPos].empty() == false) {
+			cout << szFileLines[uPos] << endl;
+			uint uDelimPos = szFileLines[uPos].find_first_of('=');
+			struct Token TokSetup;
+			
+			//Section / Group
+			if(regex_search(szFileLines[uPos], regex("^(?:.*[=][{][\n])")) == true) { 
+				TokSetup.itKeyNameType = INI_SECTION;
+				TokSetup.szKeyName = szFileLines[uPos].substr(0,uDelimPos);
+				if(string(szFileLines[uPos].substr((uDelimPos + 1), szFileLines[uPos].size())).empty() == false) {
+					TokSetup.itKeyValueType = INI_OPENBRACKET;
+					TokSetup.szKeyValue = szFileLines[uPos].substr((uDelimPos + 1), szFileLines[uPos].size());
+				} else {
+					TokMap[uPos].itKeyValueType = INI_EMPTY;
+				}
+				TokMap.push_back(TokSetup);
+			} 
+			//Capsule 
+			else if(regex_search(szFileLines[uPos], regex("^(?:.*[=][{].*[}])")) == true) {
+				TokSetup.itKeyNameType = INI_KEYNAME;
+				TokSetup.itKeyValueType = INI_CAPSULE;
+				TokSetup.szKeyName = szFileLines[uPos].substr(0,uDelimPos);
+				TokSetup.szKeyValue = szFileLines[uPos].substr((uDelimPos + 1), szFileLines[uPos].size());
+				TokMap.push_back(TokSetup);
+			}
+			//Key / Value&Association
+			else if(regex_search(szFileLines[uPos], regex("^(?:.*[=][^{].*[^}])")) == true) {
+				TokSetup.itKeyNameType = INI_KEYNAME;
+				TokSetup.itKeyValueType = INI_KEYVALUE;
+				TokSetup.szKeyName = szFileLines[uPos].substr(0,uDelimPos);
+				TokSetup.szKeyValue = szFileLines[uPos].substr((uDelimPos + 1), szFileLines[uPos].size());
+				TokMap.push_back(TokSetup);
+			}
+			//Open Bracket / Left Bracket
+			else if(regex_search(szFileLines[uPos], regex("^(?:[{])$")) == true) {
+				if(TokMap[uPos--].itKeyNameType == INI_SECTION) {
+					TokMap[uPos].itKeyValueType == INI_OPENBRACKET;
+					TokSetup.szKeyName = szFileLines[uPos].substr(0,uDelimPos);
+				} else {
+					TokSetup.itKeyNameType = INI_OPENBRACKET;
+					TokSetup.itKeyValueType = INI_EMPTY;
+					TokSetup.szKeyName = szFileLines[uPos].substr(0,uDelimPos);
+				}
+				TokMap.push_back(TokSetup);
+			}
+			//End Bracket / Right Bracket
+			else if(regex_search(szFileLines[uPos], regex("^(?:[}]$)")) == true) {
 				TokSetup.itKeyNameType = INI_ENDBRACKET;
 				TokSetup.itKeyValueType = INI_EMPTY;
-				TokSetup.szKeyName = "}";
-				vecToken.push_back(TokSetup);
-			} else {
-				//cout << "Debug: " << szFileLines[uVecPos] << endl;
+				TokSetup.szKeyName = szFileLines[uPos].substr(0,uDelimPos);
+				TokMap.push_back(TokSetup);
 			}
-
-		} 
-		/* Will trigger for these lines...
-		 * Key = {
-		 * 	cost = ...
-		 * 	bool = yes
-		 */
-		else {
-			string szKeyName = szFileLines[uVecPos].substr(0, uDelimPos);
-			string szKeyValue = szFileLines[uVecPos].substr((uDelimPos + 1), szFileLines[uVecPos].length());
-
-			struct Token TokSetup;
-
-			if(szKeyValue.compare("{") == 0) {
-				TokSetup.itKeyNameType = INI_SECTION;
-				TokSetup.itKeyValueType = INI_OPENBRACKET;
-				TokSetup.szKeyName = szKeyName;
-				TokSetup.szKeyValue = szKeyValue;
-				vecToken.push_back(TokSetup);
-			} else {
-				TokSetup.itKeyNameType = INI_KEYNAME;
-				TokSetup.szKeyName = szKeyName;
-				if(szKeyValue.find("{") != string::npos && szKeyValue.find("}") != string::npos) {
-					TokSetup.itKeyValueType = INI_CAPSULE;
-					//TokSetup.szKeyValue = szKeyValue;
-					TokSetup.szKeyValue = szKeyValue.substr(szKeyValue.find_first_of("{") , szKeyValue.find_last_of("}"));
-				} else {
-					TokSetup.itKeyValueType = INI_KEYVALUE;
-					TokSetup.szKeyValue = szKeyValue;
-				}
-
-				vecToken.push_back(TokSetup);
-			}
-
 		}
 	}
 
-	return vecToken;
+
+	return TokMap;
 }
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-

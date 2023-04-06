@@ -1,4 +1,5 @@
 #include <iostream>
+#include <unistd.h>
 
 #include "ini.h"
 #include "province.h"
@@ -11,12 +12,25 @@
 using namespace std;
 
 int main() {
-	vector<string> PopTypes = szGiveListOfPops();
 
+	string szFile = "test.txt";
+	vector<Token> TokMap = tokeniseIniFile(szFile);
+
+	//cout << TokMap[0].szKeyName << " : " << TokMap[0].szKeyValue << endl;
+	//return 0;
+
+	for(uint i = 0; i < TokMap.size(); i++) {
+		cout << TokMap[i].szKeyName << " : " << TokMap[i].szKeyValue << endl;
+	}
+
+	return 0;
+
+	vector<string> PopTypes = szGiveListOfPops();
 
 	vector<Province> Welt = populateProvinceWPops(PopTypes);
 
 	vector<State> Staten = orgIntoState(Welt);
+
 
 	for(int i = 0; i < Staten.size(); i++) {
 		cout << Staten[i].uStateID << endl;
@@ -26,7 +40,6 @@ int main() {
 	}
 
 
-	return 0;
 
 	populateProvinceWAttrib(Welt);
 	
@@ -67,5 +80,6 @@ int main() {
 	}
 
 
+	cout << '\a';
 	return 0;
 }
