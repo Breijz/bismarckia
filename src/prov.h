@@ -22,9 +22,9 @@ std::vector<std::string> szGiveListOfPops();
 
 bool bIsStrPop(std::string_view szLine, std::vector<std::string> &PopTypes);
 
-std::vector<Province> populateProvinceWPops(std::vector<std::string> &PopTypes);
+void populateProvinceWPops(std::vector<std::string> &PopTypes, std::vector<Province> &Welt);
 
-std::vector<Province> populateProvinceWAttrib(std::vector<Province> &Welt);
+void populateProvinceWAttrib(std::vector<Province> &Welt);
 
 std::vector<State> orgIntoState(std::vector<Province> const& Welt);
 

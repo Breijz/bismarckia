@@ -13,6 +13,7 @@
 using namespace std;
 
 int main() {
+	/*
 
 	string szFile = "game/history/units/ABU_oob.txt";
 	vector<Army> Armies = giveArmies(szFile);
@@ -30,7 +31,6 @@ int main() {
 	}
 	return 0;
 
-	/*
 	string szFile = "game/common/religion.txt";
 	vector<Token> TokMap = tokeniseIniFile(szFile);
 
@@ -46,7 +46,10 @@ int main() {
 
 	vector<string> PopTypes = szGiveListOfPops();
 
-	vector<Province> Welt = populateProvinceWPops(PopTypes);
+	vector<Province> Welt;
+	populateProvinceWPops(PopTypes, Welt);
+	cout << "Welt size: " << Welt.size() << endl;
+	cout << "Welt Capacity: " << Welt.capacity() << endl;
 
 
 	cout << "Orging States...\n";

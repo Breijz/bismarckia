@@ -3,6 +3,7 @@
 #include <vector>
 #include <regex>
 #include <unistd.h>
+#include <cstring>
 
 #include "pop.h"
 #include "province.h"
@@ -123,8 +124,7 @@ bool bIsStrPop(std::string_view szLine, vector<string> &PopTypes) {
 
 
 
-vector<Province> populateProvinceWPops(vector<string> &PopTypes) {
-	vector<Province> Welt;
+void populateProvinceWPops(vector<string> &PopTypes, vector<Province> &Welt) {
 	vector<string> vecFolderList = listingOfFolder("game/history/pops/1836.1.1/", true);
 	vector<Token> TokMap;
 
@@ -186,8 +186,207 @@ vector<Province> populateProvinceWPops(vector<string> &PopTypes) {
 			}
 		}
 	}
+}
 
-	return Welt;
+
+// Inspired from a similar routine in Project Alice ^-^
+string removeFSJunk(string &szLine) {
+	string szReturn;
+	const char* pcLine = szLine.c_str();
+
+	const char* uDirDelim = strrchr(pcLine, '/');
+	const char* uFileExtDelim = strrchr(pcLine, '.');
+	uint uStrLength = strlen(pcLine);
+
+	for(; uDirDelim < uFileExtDelim; uDirDelim++) {
+		szReturn.push_back(*uDirDelim);
+	}
+
+	szReturn.erase(0,1);
+	return szReturn;
+}
+
+
+void populateProvinceWAttrib(vector<Province> &Welt) {
+	vector<string> szFolderList = listingOfFolder("game/history/provinces/", true);
+
+	for(uint uFLV = 0; uFLV < szFolderList.size(); uFLV++) {
+		vector<string> szFileList = listingOfFolder(szFolderList[uFLV], true);
+		for(uint uFLPos = 0; uFLPos < szFileList.size(); uFLPos++) {
+			string szFileName = removeFSJunk(szFileList[uFLPos]);
+			uint uProvID = stoi(szFileName.substr(0, szFileName.find_first_of(' ')));
+			string szProvName = szFileName.substr((szFileName.find_last_of(' ') + 1), szFileName.length());
+
+			uint uProvPos = 0;
+			bool bFoundProv = false;
+			cout << "Welt Size: " << Welt.size() << endl;
+			for(uint i = 0; i < Welt.size(); i++) {
+				if(uProvID == Welt[i].uID) {
+					uProvPos = i;
+					bFoundProv = true;
+					break;
+				}
+			}
+			if(bFoundProv == false) {
+				cout << uProvID << " Not Found!\n";
+			} //else {
+
+				vector<Token> TokMap = tokeniseIniFile(szFileList[uFLPos]);
+				for(uint uTokPos = 0; uTokPos < TokMap.size(); uTokPos++) {
+					if(TokMap[uTokPos].itKeyNameType == INI_KEYNAME) {
+						cout << "SV - Before Sanitise: " << TokMap[uTokPos].szKeyValue << endl;
+						sanitiseString(TokMap[uTokPos].szKeyValue);
+						cout << "SV - After Sanitise: " << TokMap[uTokPos].szKeyValue << endl;
+							
+						cout << "SN - Before Sanitise: " << TokMap[uTokPos].szKeyName << endl;
+						sanitiseString(TokMap[uTokPos].szKeyName);
+						cout << "SN - After Sanitise: " << TokMap[uTokPos].szKeyName << endl;
+
+						if(TokMap[uTokPos].szKeyName.compare("trade_goods") == 0) {
+							Welt[uProvPos].szGood = TokMap[uTokPos].szKeyValue;
+						} else
+						if(TokMap[uTokPos].szKeyName.compare("life_rating") == 0) {
+							if(bCheckIfNumber(TokMap[uTokPos].szKeyValue) == true) {
+								Welt[uProvPos].uLiferating = stoi(TokMap[uTokPos].szKeyValue);
+							} else {
+								cout << "stoi() Error: " << TokMap[uTokPos].szKeyValue << endl;
+								sleep(5);
+							}
+						} else
+						if(TokMap[uTokPos].szKeyName.compare("owner") == 0) {
+							cout << "prov.cpp - szOwner: " << TokMap[uTokPos].szKeyValue << endl;
+							//Welt[uProvPos].szOwner = TokMap[uTokPos].szKeyValue;
+						} else
+						if(TokMap[uTokPos].szKeyName.compare("add_core") == 0) {
+							Welt[uProvPos].Cores.push_back(TokMap[uTokPos].szKeyValue);
+						} else
+						if(TokMap[uTokPos].szKeyName.compare("controller") == 0) {
+							Welt[uProvPos].szController = TokMap[uTokPos].szKeyValue;
+						} else
+						if(TokMap[uTokPos].szKeyName.compare("colony") == 0) {
+							if(TokMap[uTokPos].szKeyValue.compare("yes") == 0) {
+								Welt[uProvPos].bColony = true;
+							} else {
+								Welt[uProvPos].bColony = false;
+							}
+						} else
+						if(TokMap[uTokPos].szKeyName.compare("is_slave") == 0) {
+							if(TokMap[uTokPos].szKeyValue.compare("yes") == 0) {
+								Welt[uProvPos].bIsSlave = true;
+							} else {
+								Welt[uProvPos].bIsSlave = false;
+							}
+							
+						} else
+						if(TokMap[uTokPos].szKeyName.compare("fort") == 0) {
+							if(bCheckIfNumber(TokMap[uTokPos].szKeyValue) == true) {
+								Welt[uProvPos].uFort = stoi(TokMap[uTokPos].szKeyValue);
+							} else {
+								cout << "stoi() Error: " << TokMap[uTokPos].szKeyValue << endl;
+								sleep(5);
+							}
+						} else
+						if(TokMap[uTokPos].szKeyName.compare("railroad") == 0) {
+							if(bCheckIfNumber(TokMap[uTokPos].szKeyValue) == true) {
+								Welt[uProvPos].uRailroad = stoi(TokMap[uTokPos].szKeyValue);
+							} else {
+								cout << "stoi() Error: " << TokMap[uTokPos].szKeyValue << endl;
+								sleep(5);
+							}
+						} else
+						if(TokMap[uTokPos].szKeyName.compare("naval_base") == 0) {
+							if(bCheckIfNumber(TokMap[uTokPos].szKeyValue) == true) {
+								Welt[uProvPos].uNavalBase = stoi(TokMap[uTokPos].szKeyValue);
+							} else {
+								cout << "stoi() Error: " << TokMap[uTokPos].szKeyValue << endl;
+								sleep(5);
+							}
+						} else
+						if(TokMap[uTokPos].szKeyName.compare("colonial") == 0) {
+							if(TokMap[uTokPos].szKeyValue.compare("yes") == 0) {
+								Welt[uProvPos].bColonial = true;
+							} else {
+								Welt[uProvPos].bColonial = false;
+							}
+						} else
+						if(TokMap[uTokPos].szKeyName.compare("terrain") == 0) {
+							Welt[uProvPos].szTerrain = TokMap[uTokPos].szKeyValue;
+						}
+						else {
+							if(TokMap[uTokPos].szKeyName.compare("state_building") == 0) {
+								cout << "State Building Found in main sequence\n";
+							}
+							//cout << "Error in " << Welt[uProvPos].uID << " : " << TokMap[uTokPos].szKeyName << " : " << TokMap[uTokPos].szKeyValue << endl;
+							//cout << "Types : " << TokMap[uTokPos].itKeyNameType << " : " << TokMap[uTokPos].itKeyValueType << endl;
+						}
+
+					} else if(TokMap[uTokPos].itKeyNameType == INI_SECTION) {
+						sanitiseString(TokMap[uTokPos].szKeyValue);
+						if(regex_match(TokMap[uTokPos].szKeyName, regex("^(?:[0-9]{4}[.][0-9]{1,2}[.][0-9]{1,2}[=][{]$)")) == true) {
+							// TODO: Implement historical bookmarks
+							for(; uTokPos < TokMap.size(); uTokPos++) {
+								uint uOB = 0;
+								uint uEB = 0;
+								if(TokMap[uTokPos].itKeyNameType == INI_OPENBRACKET || TokMap[uTokPos].itKeyValueType == INI_OPENBRACKET) {
+									uOB++;
+								}
+								if(TokMap[uTokPos].itKeyNameType == INI_ENDBRACKET || TokMap[uTokPos].itKeyValueType == INI_ENDBRACKET) {
+									uEB++;
+								}
+								if(uOB == uEB) {
+									break;
+								}
+							}
+						} else {
+							if(TokMap[uTokPos].szKeyName.compare("state_building") == 0) {
+								struct Factory FactSetup;
+								for(; uTokPos < TokMap.size(); uTokPos++) {
+										if(TokMap[uTokPos].szKeyName.compare("level") == 0) {
+											FactSetup.uLevel = stoi(TokMap[uTokPos].szKeyValue);
+										}else
+										if(TokMap[uTokPos].szKeyName.compare("building") == 0) {
+											FactSetup.szBuilding = TokMap[uTokPos].szKeyValue;
+										} else
+										if(TokMap[uTokPos].szKeyName.compare("upgrade") == 0) {
+											if(TokMap[uTokPos].szKeyValue.compare("yes") == 0) {
+												FactSetup.bUpgrade = true;
+											} else {
+												FactSetup.bUpgrade = false;
+											}
+										}
+									if(TokMap[uTokPos].itKeyNameType == INI_ENDBRACKET || TokMap[uTokPos].itKeyValueType == INI_ENDBRACKET) { 
+										Welt[uProvPos].Factories.push_back(FactSetup);
+										break; 
+									}
+								}
+							} else
+							if(TokMap[uTokPos].szKeyName.compare("revolt") == 0) {
+								struct Revolt RevSetup;
+								for(; uTokPos < TokMap.size(); uTokPos++) {
+									if(TokMap[uTokPos].szKeyName.compare("type") == 0) {
+										RevSetup.szType = TokMap[uTokPos].szKeyValue;
+									} else
+									if(TokMap[uTokPos].szKeyName.compare("controller") == 0) {
+										if(TokMap[uTokPos].szKeyValue.compare("yes") == 0) {
+											RevSetup.bController = true;
+										} else {
+											RevSetup.bController = false;
+										}
+									} else {
+										cout << "Unknown Variable! " << TokMap[uTokPos].szKeyName << endl;
+									}
+									if(TokMap[uTokPos].itKeyNameType == INI_ENDBRACKET || TokMap[uTokPos].itKeyValueType == INI_ENDBRACKET) { 
+										Welt[uProvPos].Rebellions.push_back(RevSetup);
+										break; 
+									}
+								}
+							}
+						}
+					}
+				}
+			//}
+		}
+	}
 }
 
 
