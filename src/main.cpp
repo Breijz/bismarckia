@@ -31,8 +31,15 @@ int main() {
 
 	vector<Province> Welt = populateProvinceWPops(PopTypes);
 
+
+	cout << "Orging States...\n";
+	sleep(5);
 	vector<State> Staten = orgIntoState(Welt);
 
+
+	
+	cout << "Finished Orging States!\n";
+	sleep(5);
 
 	for(int i = 0; i < Staten.size(); i++) {
 		cout << Staten[i].uStateID << endl;
@@ -40,6 +47,8 @@ int main() {
 			cout << "\t" << Staten[i].Provinces[x].uProvID << endl;
 		}
 	}
+
+	return 0;
 
 
 

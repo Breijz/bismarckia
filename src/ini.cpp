@@ -45,7 +45,10 @@ string cleanString(string &szLine) {
 		if(szLine[i] != ' ' && szLine[i] != '#' && szLine[i] != '\t') {
 			if(bCapsule == true && szLine[i] == '{') { 
 				for(; i < szLine.size(); i++) {
-					szCleaned.push_back(szLine[i]);
+					if(szLine[i] == '#') { break; }
+					if(szLine[i] != '\r') {
+						szCleaned.push_back(szLine[i]);
+					}
 				}
 				break; 
 			}
@@ -94,7 +97,7 @@ vector<Token> tokeniseIniFile(string szFile) {
 
 	for(uint uPos = 0; uPos < szFileLines.size(); uPos++) {
 		if(szFileLines[uPos].empty() == false) {
-			cout << szFileLines[uPos] << endl;
+			//cout << szFileLines[uPos] << endl;
 			uint uDelimPos = szFileLines[uPos].find_first_of('=');
 			struct Token TokSetup;
 			

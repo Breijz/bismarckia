@@ -357,7 +357,7 @@ vector<Province> populateProvinceWAttrib(vector<Province> &Welt) {
 
 
 // TODO/NOTE: This code _doesnt_ create new states for divided states (z.B. where one country controls ProvIDs 1 and 2 and another ProvIDs 3, 4 and 5, of a state which would have ProvIDs, 1, 2, 3, 4 and 5
-vector<State> orgIntoState(vector<Province> const& Welt) {
+/*vector<State> orgIntoState(vector<Province> const& Welt) {
 	vector<Token> TokMap = tokeniseIniFile("game/map/region.txt");
 	vector<State> Staten;
 	for(uint uTokPos = 0; uTokPos < TokMap.size(); uTokPos++) {
@@ -366,23 +366,28 @@ vector<State> orgIntoState(vector<Province> const& Welt) {
 			string test = TokMap[uTokPos].szKeyName.substr((TokMap[uTokPos].szKeyName.find_first_of("_") + 1), (TokMap[uTokPos].szKeyName.find_first_of("=") - 1));
 			cout << "orgIntoState 1: " << test << endl;
 			Staat.uStateID = stoi(test);
-			string tList = TokMap[uTokPos].szKeyValue.substr(1, TokMap[uTokPos].szKeyValue.length());
-			vector<string> ProvIDs = vecSeperateAtChar(tList, ',');
+			//string tList = TokMap[uTokPos].szKeyValue.substr(1, TokMap[uTokPos].szKeyValue.length());
+			string tList = TokMap[uTokPos].szKeyValue.substr((TokMap[uTokPos].szKeyValue.find_first_of('{') + 2), (TokMap[uTokPos].szKeyValue.find_first_of('}') - 2));
+			vector<string> ProvIDs = vecSeperateAtChar(tList, ' ');
 			struct i_StateProvPos sppBundle;
 			for(int i = 0; i < ProvIDs.size(); i++) {
 				cout << "orgIntoState 2: " << ProvIDs[i] << endl;
-				sppBundle.uProvID = stoi(ProvIDs[i]);
-				bool bFoundID = false;
-				for(int x = 0; x < Welt.size(); x++) {
-					if(Welt[x].uID == sppBundle.uProvID) {
-						sppBundle.uProvPos = x;
-						bFoundID = true;
-						Staat.Provinces.push_back(sppBundle);
-						break;
+				if(ProvIDs[i].empty() == false) {
+					sppBundle.uProvID = stoi(ProvIDs[i]);
+					bool bFoundID = false;
+					for(int x = 0; x < Welt.size(); x++) {
+						if(Welt[x].uID == sppBundle.uProvID) {
+							sppBundle.uProvPos = x;
+							bFoundID = true;
+							Staat.Provinces.push_back(sppBundle);
+							break;
+						} else {
+							cout << Welt[x].uID << " =/= " << sppBundle.uProvID << endl;
+						}
 					}
-				}
-				if(bFoundID == false) {
-					cout << "prov.cpp :: orgIntoState : Province ID: " << sppBundle.uProvID << " not found!\n";
+					if(bFoundID == false) {
+						cout << "prov.cpp :: orgIntoState : Province ID: " << sppBundle.uProvID << " not found!\n";
+					}
 				}
 			}
 			Staten.push_back(Staat);
@@ -390,6 +395,81 @@ vector<State> orgIntoState(vector<Province> const& Welt) {
 		}
 	}
 
+	return Staten;
+}*/
+
+bool bIsStrNumber(string szLine) {
+	for(uint i = 0; i < szLine.length(); i++) {
+		if(isdigit(szLine[i]) == false) {
+			return false;
+		}
+	}
+	return true;
+}
+
+vector<State> orgIntoState(vector<Province> Welt) {
+	vector<Token> TokMap = tokeniseIniFile("game/map/region.txt");
+	vector<State> Staten;
+
+	for(uint uTokPos = 0; uTokPos < TokMap.size(); uTokPos++) {
+		if(TokMap[uTokPos].itKeyNameType == INI_KEYNAME && TokMap[uTokPos].itKeyValueType == INI_CAPSULE) {
+			State Staat;
+			string szCapsule = TokMap[uTokPos].szKeyValue.substr((TokMap[uTokPos].szKeyValue.find_first_of('{') + 2), (TokMap[uTokPos].szKeyValue.find_first_of('}') - 2));
+			vector<string> Temp = vecSeperateAtChar(szCapsule, ' ');
+			vector<uint> uStateProvIDs;
+			for(uint i = 0; i < Temp.size(); i++) {
+				if(Temp[i].empty() == false) {
+					uStateProvIDs.push_back(stoi(Temp[i]));
+				}
+			}
+			string szStateID = TokMap[uTokPos].szKeyName.substr((TokMap[uTokPos].szKeyName.find_first_of('_') + 1), TokMap[uTokPos].szKeyName.length());
+			if(bIsStrNumber(szStateID) == true) {
+				cout << "\'" << szStateID << "\'" << " is a number!\n";
+				Staat.uStateID = stoi(szStateID);
+
+				struct i_StateProvPos sppBundle;
+
+				cout << "uStateProvIDs Size: " << uStateProvIDs.size() << endl;
+				for(uint x = 0; x < uStateProvIDs.size(); x++) {
+					cout << "Line 420: " << uStateProvIDs[x] << endl;
+					sppBundle.uProvID = uStateProvIDs[x];
+					cout << "Welt Size: " << Welt.size() << endl;
+					uint uProvPos = 0;
+					bool bFoundID = false;
+					for(uint i = 0; i < Welt.size(); i++) {
+						if(uStateProvIDs[x] == Welt[i].uID) {
+							uProvPos = i;
+							bFoundID = true;
+						} else {
+							cout << Welt[i].uID << " =/= " << uStateProvIDs[x] << endl;
+						}
+					}
+					sppBundle.uProvPos = uProvPos;
+					Staat.Provinces.push_back(sppBundle);
+					if(bFoundID == false) {
+						cout << "Didnt Find ID!\n";
+					}
+					/*
+					for(uint y = 0; y < Welt.size(); y++) {
+						if(Welt[y].uID == uStateProvIDs[x]) {
+							cout << "Found ID!\n";
+							bFoundID = true;
+							sppBundle.uProvPos = y;
+							Staat.Provinces.push_back(sppBundle);
+						} else {
+							cout << Welt[y].uID << " =/= " << uStateProvIDs[x] << endl;
+						}
+
+					}
+					*/
+				}
+				Staten.push_back(Staat);
+			} else {
+				cout << "\'" << szStateID << "\'" << " is not a number!\n";
+			}
+		}
+	}
+	
 	return Staten;
 }
 
