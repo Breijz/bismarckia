@@ -8,10 +8,27 @@
 #include "filelisting.h"
 #include "factory.h"
 #include "goods.h"
+#include "army.h"
 
 using namespace std;
 
 int main() {
+
+	string szFile = "game/history/units/ABU_oob.txt";
+	vector<Army> Armies = giveArmies(szFile);
+	cout << "test\n";
+
+	for(uint x = 0; x < Armies.size(); x++) {
+		cout << "szName: " <<Armies[x].szName << endl;
+		cout << "uLocation: " << Armies[x].uLocation << endl;
+		cout << "Regiments:\n";
+		for(uint y = 0; y < Armies[x].Regiments.size(); y++) {
+			cout << "\t szName: " << Armies[x].Regiments[y].szName << endl;
+			cout << "\t szType: " << Armies[x].Regiments[y].szType << endl;
+			cout << "\t uHomeProvID: " << Armies[x].Regiments[y].uHomeProvID << endl;
+		}
+	}
+	return 0;
 
 	/*
 	string szFile = "game/common/religion.txt";
@@ -48,11 +65,16 @@ int main() {
 		}
 	}
 
-	return 0;
+
+	cout << "Finished Displaying States w/ Provinces!\n";
+	sleep(5);
 
 
-
+	cout << "Populating Provinces With Attributes!\n";
+	sleep(5);
 	populateProvinceWAttrib(Welt);
+	cout << "Finished Populating Provinces with Attributes!\n";
+	sleep(5);
 	
 
 	for(int y = 0; y < Welt.size(); y++) {

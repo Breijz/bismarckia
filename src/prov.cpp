@@ -192,7 +192,7 @@ vector<Province> populateProvinceWPops(vector<string> &PopTypes) {
 
 
 
-vector<Province> populateProvinceWAttrib(vector<Province> &Welt) {
+/*vector<Province> populateProvinceWAttrib(vector<Province> &Welt) {
 	vector<string> szFolderList = listingOfFolder("game/history/provinces/", true);
 
 	for(uint uFLV = 0; uFLV < szFolderList.size(); uFLV++) {
@@ -221,7 +221,6 @@ vector<Province> populateProvinceWAttrib(vector<Province> &Welt) {
 					sanitiseString(TokMap[uTokPos].szKeyValue);
 
 					if(TokMap[uTokPos].szKeyName.compare("trade_goods") == 0) {
-						sanitiseString(TokMap[uTokPos].szKeyValue);
 						Welt[uProvPos].szGood = TokMap[uTokPos].szKeyValue;
 					} else
 					if(TokMap[uTokPos].szKeyName.compare("life_rating") == 0) {
@@ -234,7 +233,7 @@ vector<Province> populateProvinceWAttrib(vector<Province> &Welt) {
 					} else
 					if(TokMap[uTokPos].szKeyName.compare("owner") == 0) {
 						cout << "prov.cpp - szOwner: " << TokMap[uTokPos].szKeyValue << endl;
-						Welt[uProvPos].szOwner = TokMap[uTokPos].szKeyValue;
+						//Welt[uProvPos].szOwner = TokMap[uTokPos].szKeyValue;
 					} else
 					if(TokMap[uTokPos].szKeyName.compare("add_core") == 0) {
 						Welt[uProvPos].Cores.push_back(TokMap[uTokPos].szKeyValue);
@@ -340,8 +339,24 @@ vector<Province> populateProvinceWAttrib(vector<Province> &Welt) {
 							}
 						} else
 						if(TokMap[uTokPos].szKeyName.compare("revolt") == 0) {
-							for(; uTokPos < TokMap.size(); uTokPos++) {													// TODO : Implement
-								if(TokMap[uTokPos].itKeyNameType == INI_ENDBRACKET || TokMap[uTokPos].itKeyValueType == INI_ENDBRACKET) { break; }
+							struct Revolt RevSetup;
+							for(; uTokPos < TokMap.size(); uTokPos++) {
+								if(TokMap[uTokPos].szKeyName.compare("type") == 0) {
+									RevSetup.szType = TokMap[uTokPos].szKeyValue;
+								} else
+								if(TokMap[uTokPos].szKeyName.compare("controller") == 0) {
+									if(TokMap[uTokPos].szKeyValue.compare("yes") == 0) {
+										RevSetup.bController = true;
+									} else {
+										RevSetup.bController = false;
+									}
+								} else {
+									cout << "Unknown Variable! " << TokMap[uTokPos].szKeyName << endl;
+								}
+								if(TokMap[uTokPos].itKeyNameType == INI_ENDBRACKET || TokMap[uTokPos].itKeyValueType == INI_ENDBRACKET) { 
+									Welt[uProvPos].Rebellions.push_back(RevSetup);
+									break; 
+								}
 							}
 						}
 					}
@@ -353,50 +368,8 @@ vector<Province> populateProvinceWAttrib(vector<Province> &Welt) {
 
 	return Welt;
 }
+*/
 
-
-
-// TODO/NOTE: This code _doesnt_ create new states for divided states (z.B. where one country controls ProvIDs 1 and 2 and another ProvIDs 3, 4 and 5, of a state which would have ProvIDs, 1, 2, 3, 4 and 5
-/*vector<State> orgIntoState(vector<Province> const& Welt) {
-	vector<Token> TokMap = tokeniseIniFile("game/map/region.txt");
-	vector<State> Staten;
-	for(uint uTokPos = 0; uTokPos < TokMap.size(); uTokPos++) {
-		if(TokMap[uTokPos].itKeyNameType == INI_KEYNAME) {
-			State Staat;
-			string test = TokMap[uTokPos].szKeyName.substr((TokMap[uTokPos].szKeyName.find_first_of("_") + 1), (TokMap[uTokPos].szKeyName.find_first_of("=") - 1));
-			cout << "orgIntoState 1: " << test << endl;
-			Staat.uStateID = stoi(test);
-			//string tList = TokMap[uTokPos].szKeyValue.substr(1, TokMap[uTokPos].szKeyValue.length());
-			string tList = TokMap[uTokPos].szKeyValue.substr((TokMap[uTokPos].szKeyValue.find_first_of('{') + 2), (TokMap[uTokPos].szKeyValue.find_first_of('}') - 2));
-			vector<string> ProvIDs = vecSeperateAtChar(tList, ' ');
-			struct i_StateProvPos sppBundle;
-			for(int i = 0; i < ProvIDs.size(); i++) {
-				cout << "orgIntoState 2: " << ProvIDs[i] << endl;
-				if(ProvIDs[i].empty() == false) {
-					sppBundle.uProvID = stoi(ProvIDs[i]);
-					bool bFoundID = false;
-					for(int x = 0; x < Welt.size(); x++) {
-						if(Welt[x].uID == sppBundle.uProvID) {
-							sppBundle.uProvPos = x;
-							bFoundID = true;
-							Staat.Provinces.push_back(sppBundle);
-							break;
-						} else {
-							cout << Welt[x].uID << " =/= " << sppBundle.uProvID << endl;
-						}
-					}
-					if(bFoundID == false) {
-						cout << "prov.cpp :: orgIntoState : Province ID: " << sppBundle.uProvID << " not found!\n";
-					}
-				}
-			}
-			Staten.push_back(Staat);
-
-		}
-	}
-
-	return Staten;
-}*/
 
 bool bIsStrNumber(string szLine) {
 	for(uint i = 0; i < szLine.length(); i++) {
@@ -407,7 +380,7 @@ bool bIsStrNumber(string szLine) {
 	return true;
 }
 
-vector<State> orgIntoState(vector<Province> Welt) {
+vector<State> orgIntoState(vector<Province> const& Welt) {
 	vector<Token> TokMap = tokeniseIniFile("game/map/region.txt");
 	vector<State> Staten;
 
@@ -472,85 +445,4 @@ vector<State> orgIntoState(vector<Province> Welt) {
 	
 	return Staten;
 }
-
-
-
-/*
-// TODO/NOTE: This code _doesnt_ create new states for divided states (z.B. where one country controls ProvIDs 1 and 2 and another ProvIDs 3, 4 and 5, of a state which would have ProvIDs, 1, 2, 3, 4 and 5
-vector<State> orgIntoState(vector<Province> const& Welt) {
-	vector<State> Staten;
-	ifstream Readfile;
-	vector<string> szFileLines;
-	string szLine;
-	Readfile.open("game/map/region.txt");
-	while(getline(Readfile,szLine)) {
-		string szCleaned;
-		for(uint i = 0; i < szLine.size(); i++) {
-			if(szLine[i] == '#') {
-				szFileLines.push_back(szCleaned);
-				break;
-			} else {
-				szCleaned.push_back(szLine[i]);
-			}
-		}
-	}
-	Readfile.close();
-
-	for(uint uPos = 0; uPos < szFileLines.size(); uPos++) {
-		State Staat;
-		string szFS = szFileLines[uPos].substr((szFileLines[uPos].find_first_of('{') + 1),(szFileLines[uPos].find_first_of('}') - 1));
-		cout << "szFS: "<< szFS << endl;
-		vector<string> Temp = vecSeperateAtChar(szFS, ' ');
-		uint uStateID = stoi(szFileLines[uPos].substr(szFileLines[uPos].find_first_of('_') + 1, szFileLines[uPos].find_first_of('=') - 1));
-		Staat.uStateID = uStateID;
-
-		for(uint i = 0; i < Temp.size(); i++) {
-			cout << Temp[i] << endl;
-		}
-		
-		for(uint i = 0; i < Temp.size(); i++) {
-			struct i_StateProvPos sppBundle;
-			sppBundle.uProvID = stoi(Temp[i]);
-			for(uint z = 0; z < Welt.size(); z++) {
-				if(Welt[z].uID == sppBundle.uProvID) {
-					sppBundle.uProvPos = z;
-					break;
-				}
-			}
-		}
-		Staten.push_back(Staat);
-
-	}
-
-
-
-
-	return Staten;
-}
-*/
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
 
