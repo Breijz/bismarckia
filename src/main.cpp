@@ -13,7 +13,8 @@ using namespace std;
 
 int main() {
 
-	string szFile = "test.txt";
+	/*
+	string szFile = "game/common/religion.txt";
 	vector<Token> TokMap = tokeniseIniFile(szFile);
 
 	//cout << TokMap[0].szKeyName << " : " << TokMap[0].szKeyValue << endl;
@@ -24,6 +25,7 @@ int main() {
 	}
 
 	return 0;
+	*/
 
 	vector<string> PopTypes = szGiveListOfPops();
 

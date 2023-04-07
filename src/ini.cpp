@@ -36,14 +36,19 @@ vector<string> vecSeperateAtChar(string &szLine, char cDelim) {
 
 string cleanString(string &szLine) {
 	bool bCapsule = false;
+	string szCleaned;
 	//check if were dealing with a capsule
 	if(regex_search(szLine, regex("(?:[{].*[}])")) == true) {
 		bCapsule = true;	
 	}
-	string szCleaned;
 	for(uint i = 0; i < szLine.size(); i++) {
 		if(szLine[i] != ' ' && szLine[i] != '#' && szLine[i] != '\t') {
-			if(bCapsule == true && szLine[i] == '{') { break; }
+			if(bCapsule == true && szLine[i] == '{') { 
+				for(; i < szLine.size(); i++) {
+					szCleaned.push_back(szLine[i]);
+				}
+				break; 
+			}
 			if(szLine[i] == '\r' && szLine[i+1] != '\n') {
 				szCleaned.push_back('\n');
 				i=i+2;
@@ -114,7 +119,7 @@ vector<Token> tokeniseIniFile(string szFile) {
 				TokMap.push_back(TokSetup);
 			}
 			//Key / Value&Association
-			else if(regex_search(szFileLines[uPos], regex("^(?:.*[=][^{].*[^}])")) == true) {
+			else if(regex_search(szFileLines[uPos], regex("^(?:.*[=].*[^}])")) == true) {
 				TokSetup.itKeyNameType = INI_KEYNAME;
 				TokSetup.itKeyValueType = INI_KEYVALUE;
 				TokSetup.szKeyName = szFileLines[uPos].substr(0,uDelimPos);

@@ -319,7 +319,7 @@ vector<Province> populateProvinceWAttrib(vector<Province> &Welt) {
 					} else {
 						if(TokMap[uTokPos].szKeyName.compare("state_building") == 0) {
 							struct Factory FactSetup;
-							for(; uTokPos < TokMap.size(); uTokPos++) {													// TODO : Implement
+							for(; uTokPos < TokMap.size(); uTokPos++) {
 									if(TokMap[uTokPos].szKeyName.compare("level") == 0) {
 										FactSetup.uLevel = stoi(TokMap[uTokPos].szKeyValue);
 									}else
@@ -395,7 +395,59 @@ vector<State> orgIntoState(vector<Province> const& Welt) {
 
 
 
+/*
+// TODO/NOTE: This code _doesnt_ create new states for divided states (z.B. where one country controls ProvIDs 1 and 2 and another ProvIDs 3, 4 and 5, of a state which would have ProvIDs, 1, 2, 3, 4 and 5
+vector<State> orgIntoState(vector<Province> const& Welt) {
+	vector<State> Staten;
+	ifstream Readfile;
+	vector<string> szFileLines;
+	string szLine;
+	Readfile.open("game/map/region.txt");
+	while(getline(Readfile,szLine)) {
+		string szCleaned;
+		for(uint i = 0; i < szLine.size(); i++) {
+			if(szLine[i] == '#') {
+				szFileLines.push_back(szCleaned);
+				break;
+			} else {
+				szCleaned.push_back(szLine[i]);
+			}
+		}
+	}
+	Readfile.close();
 
+	for(uint uPos = 0; uPos < szFileLines.size(); uPos++) {
+		State Staat;
+		string szFS = szFileLines[uPos].substr((szFileLines[uPos].find_first_of('{') + 1),(szFileLines[uPos].find_first_of('}') - 1));
+		cout << "szFS: "<< szFS << endl;
+		vector<string> Temp = vecSeperateAtChar(szFS, ' ');
+		uint uStateID = stoi(szFileLines[uPos].substr(szFileLines[uPos].find_first_of('_') + 1, szFileLines[uPos].find_first_of('=') - 1));
+		Staat.uStateID = uStateID;
+
+		for(uint i = 0; i < Temp.size(); i++) {
+			cout << Temp[i] << endl;
+		}
+		
+		for(uint i = 0; i < Temp.size(); i++) {
+			struct i_StateProvPos sppBundle;
+			sppBundle.uProvID = stoi(Temp[i]);
+			for(uint z = 0; z < Welt.size(); z++) {
+				if(Welt[z].uID == sppBundle.uProvID) {
+					sppBundle.uProvPos = z;
+					break;
+				}
+			}
+		}
+		Staten.push_back(Staat);
+
+	}
+
+
+
+
+	return Staten;
+}
+*/
 
 
 
