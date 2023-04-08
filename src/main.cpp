@@ -13,48 +13,32 @@
 using namespace std;
 
 int main() {
-	/*
-
-	string szFile = "game/history/units/ABU_oob.txt";
-	vector<Army> Armies = giveArmies(szFile);
-	cout << "test\n";
-
-	for(uint x = 0; x < Armies.size(); x++) {
-		cout << "szName: " <<Armies[x].szName << endl;
-		cout << "uLocation: " << Armies[x].uLocation << endl;
-		cout << "Regiments:\n";
-		for(uint y = 0; y < Armies[x].Regiments.size(); y++) {
-			cout << "\t szName: " << Armies[x].Regiments[y].szName << endl;
-			cout << "\t szType: " << Armies[x].Regiments[y].szType << endl;
-			cout << "\t uHomeProvID: " << Armies[x].Regiments[y].uHomeProvID << endl;
-		}
-	}
-	return 0;
-
-	string szFile = "game/common/religion.txt";
-	vector<Token> TokMap = tokeniseIniFile(szFile);
-
-	//cout << TokMap[0].szKeyName << " : " << TokMap[0].szKeyValue << endl;
-	//return 0;
-
-	for(uint i = 0; i < TokMap.size(); i++) {
-		cout << TokMap[i].szKeyName << " : " << TokMap[i].szKeyValue << endl;
-	}
-
-	return 0;
-	*/
-
-	vector<string> PopTypes = szGiveListOfPops();
 
 	vector<Province> Welt;
+	vector<string> PopTypes = szGiveListOfPops();
+
+	cout << "Populating Provinces With Attributes!\n";
+	sleep(5);
+	cout << Welt.size() << endl;
+	populateProvinceWAttrib(Welt);
+	cout << Welt.size() << endl;
+	cout << "Finished Populating Provinces with Attributes!\n";
+	sleep(5);
+
+	cout << "Populating Provinces With Pops!\n";
+	sleep(5);
+	cout << Welt.size() << endl;
 	populateProvinceWPops(PopTypes, Welt);
-	cout << "Welt size: " << Welt.size() << endl;
-	cout << "Welt Capacity: " << Welt.capacity() << endl;
+	cout << Welt.size() << endl;
+	cout << "Finished Populating Provinces With Pops!\n";
+	sleep(5);
 
 
 	cout << "Orging States...\n";
 	sleep(5);
+	cout << Welt.size() << endl;
 	vector<State> Staten = orgIntoState(Welt);
+	cout << Welt.size() << endl;
 
 
 	
@@ -73,15 +57,11 @@ int main() {
 	sleep(5);
 
 
-	cout << "Populating Provinces With Attributes!\n";
-	sleep(5);
-	populateProvinceWAttrib(Welt);
-	cout << "Finished Populating Provinces with Attributes!\n";
-	sleep(5);
 	
 
 	for(int y = 0; y < Welt.size(); y++) {
 		cout << Welt[y].uID << ":\n";
+		cout << Welt[y].szName << ":\n";
 		cout << "\t" << "Trade Good: " << Welt[y].szGood << endl;
 		cout << "\t" << "LifeRating: " << Welt[y].uLiferating << endl;
 		cout << "\t" << "Owner: " << Welt[y].szOwner << endl;
